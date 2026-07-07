@@ -1,0 +1,547 @@
+<title>Convex Search — Vì sao Surveys/Polls trả kết quả không liên quan</title>
+<style>
+  :root {
+    --bg: #f5f7f8;
+    --surface: #ffffff;
+    --surface-sunken: #eef2f3;
+    --text: #1c2428;
+    --text-muted: #57666d;
+    --text-faint: #8a969b;
+    --border: #dbe3e6;
+    --accent: #1f6f78;
+    --accent-strong: #14545c;
+    --accent-tint: #e2eeef;
+    --warn: #9a5c17;
+    --warn-tint: #f7ead2;
+    --warn-border: #e3c088;
+    --good: #3f7d4a;
+    --good-tint: #e3f0e3;
+    --code-bg: #eef2f1;
+    --shadow: 0 1px 2px rgba(20, 30, 33, 0.06), 0 6px 20px rgba(20, 30, 33, 0.05);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #11161a;
+      --surface: #171e23;
+      --surface-sunken: #1d262b;
+      --text: #e6ecee;
+      --text-muted: #9bacb2;
+      --text-faint: #6c7b81;
+      --border: #2a343a;
+      --accent: #56c2cc;
+      --accent-strong: #7fd4dc;
+      --accent-tint: #17393d;
+      --warn: #e7ad5e;
+      --warn-tint: #33290f;
+      --warn-border: #5c451c;
+      --good: #79c084;
+      --good-tint: #17301c;
+      --code-bg: #1a2226;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #11161a;
+    --surface: #171e23;
+    --surface-sunken: #1d262b;
+    --text: #e6ecee;
+    --text-muted: #9bacb2;
+    --text-faint: #6c7b81;
+    --border: #2a343a;
+    --accent: #56c2cc;
+    --accent-strong: #7fd4dc;
+    --accent-tint: #17393d;
+    --warn: #e7ad5e;
+    --warn-tint: #33290f;
+    --warn-border: #5c451c;
+    --good: #79c084;
+    --good-tint: #17301c;
+    --code-bg: #1a2226;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  :root[data-theme="light"] {
+    --bg: #f5f7f8;
+    --surface: #ffffff;
+    --surface-sunken: #eef2f3;
+    --text: #1c2428;
+    --text-muted: #57666d;
+    --text-faint: #8a969b;
+    --border: #dbe3e6;
+    --accent: #1f6f78;
+    --accent-strong: #14545c;
+    --accent-tint: #e2eeef;
+    --warn: #9a5c17;
+    --warn-tint: #f7ead2;
+    --warn-border: #e3c088;
+    --good: #3f7d4a;
+    --good-tint: #e3f0e3;
+    --code-bg: #eef2f1;
+    --shadow: 0 1px 2px rgba(20, 30, 33, 0.06), 0 6px 20px rgba(20, 30, 33, 0.05);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Iowan Old Style", "Palatino Linotype", Georgia, "Songti SC", serif;
+  }
+
+  .sans {
+    font-family: -apple-system, "Segoe UI", "Helvetica Neue", Arial, "PingFang SC", sans-serif;
+  }
+
+  .mono {
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .page {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  /* Masthead */
+  .masthead {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 36px;
+  }
+
+  .eyebrow {
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  h1 {
+    font-size: 34px;
+    line-height: 1.18;
+    margin: 0;
+    font-weight: 600;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 22px;
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .meta-row b { color: var(--text); font-weight: 600; }
+
+  /* Section rhythm */
+  section { margin-bottom: 44px; }
+
+  h2 {
+    font-size: 13px;
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 0 0 16px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  h2 .num {
+    color: var(--accent);
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 22px 0 8px;
+    letter-spacing: -0.005em;
+  }
+
+  p {
+    font-size: 16.5px;
+    line-height: 1.65;
+    max-width: 66ch;
+    margin: 0 0 14px;
+  }
+
+  p.sans, li.sans { font-family: -apple-system, "Segoe UI", Arial, sans-serif; }
+
+  a { color: var(--accent-strong); }
+
+  code {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 0.88em;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.05em 0.4em;
+  }
+
+  /* Verdict callout — the one place we spend boldness */
+  .verdict {
+    background: var(--warn-tint);
+    border: 1px solid var(--warn-border);
+    border-top: 3px solid var(--warn);
+    border-radius: 8px;
+    padding: 22px 24px;
+    margin: 0 0 44px;
+    box-shadow: var(--shadow);
+  }
+
+  .verdict .label {
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--warn);
+    margin-bottom: 8px;
+  }
+
+  .verdict p { margin-bottom: 10px; max-width: none; font-size: 16px; }
+  .verdict p:last-child { margin-bottom: 0; }
+
+  /* Fact list (definition-style, not a sequence) */
+  .facts {
+    display: grid;
+    grid-template-columns: 168px 1fr;
+    gap: 14px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 22px;
+    box-shadow: var(--shadow);
+  }
+
+  .facts dt {
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-muted);
+    padding-top: 2px;
+  }
+
+  .facts dd {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    font-size: 14.5px;
+    line-height: 1.55;
+  }
+
+  .facts dd cite {
+    display: block;
+    font-style: normal;
+    font-size: 12.5px;
+    color: var(--text-faint);
+    margin-top: 4px;
+  }
+
+  /* Code reference chip */
+  .ref {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 12.5px;
+    color: var(--accent-strong);
+    text-decoration: none;
+    background: var(--accent-tint);
+    border-radius: 4px;
+    padding: 1px 6px;
+    white-space: nowrap;
+  }
+
+  /* Tokenization diagram */
+  .diagram {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 26px 26px 22px;
+    box-shadow: var(--shadow);
+  }
+
+  .diagram-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 0;
+  }
+
+  .diagram-row + .diagram-row { border-top: 1px dashed var(--border); }
+
+  .diagram-src {
+    width: 132px;
+    flex: 0 0 auto;
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    font-size: 12px;
+  }
+
+  .diagram-src .kind {
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .diagram-src .label {
+    margin-top: 3px;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    flex: 1 1 auto;
+  }
+
+  .chip {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 13px;
+    padding: 4px 9px;
+    border-radius: 5px;
+    background: var(--surface-sunken);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  .chip.hit {
+    background: var(--good-tint);
+    border-color: var(--good);
+    color: var(--good);
+    font-weight: 600;
+  }
+
+  .chip.collide {
+    background: var(--warn-tint);
+    border-color: var(--warn);
+    color: var(--warn);
+    font-weight: 700;
+  }
+
+  .diagram-verdict {
+    flex: 0 0 auto;
+    width: 168px;
+    text-align: right;
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+
+  .diagram-verdict.strong { color: var(--good); }
+  .diagram-verdict.weak { color: var(--warn); }
+
+  .diagram-caption {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.55;
+  }
+
+  .diagram-caption .chip { padding: 1px 5px; font-size: 12px; }
+
+  /* Results table */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--shadow); }
+
+  table { border-collapse: collapse; width: 100%; min-width: 560px; background: var(--surface); }
+
+  th, td {
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    font-size: 13.5px;
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  th {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: var(--surface-sunken);
+    font-weight: 700;
+  }
+
+  td.mono-id { font-family: ui-monospace, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+  tr:last-child td { border-bottom: none; }
+
+  .pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .pill.good { background: var(--good-tint); color: var(--good); }
+  .pill.warn { background: var(--warn-tint); color: var(--warn); }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    font-size: 12.5px;
+    color: var(--text-faint);
+    line-height: 1.8;
+  }
+
+  footer a { color: var(--text-faint); }
+
+  @media (max-width: 560px) {
+    .facts { grid-template-columns: 1fr; }
+    .diagram-row { flex-wrap: wrap; }
+    .diagram-src { width: 100%; }
+    .diagram-verdict { width: 100%; text-align: left; }
+  }
+</style>
+
+<div class="page">
+
+  <div class="masthead">
+    <div class="eyebrow sans">Memo kỹ thuật · Search &amp; Relevance</div>
+    <h1>Vì sao tìm "Noo's Question" lại trả về "Survey Poll S-135"</h1>
+    <div class="meta-row">
+      <span>Phạm vi: <b>module k174yh8ddk5fhbf9r2n3hn2a7s898bae</b> — tab Surveys/Polls</span>
+      <span>Trạng thái: <b>Kết luận — giữ nguyên hành vi hiện tại</b></span>
+      <span>Ngày: <b>2026-07-07</b></span>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <div class="label">Kết luận ngắn</div>
+    <p><b>Không phải bug hiển thị dữ liệu sai.</b> Đây là hệ quả của cách Convex full-text search tách từ (tokenize) và xếp hạng theo số từ khớp, không yêu cầu khớp <i>toàn bộ</i> cụm tìm kiếm.</p>
+    <p>Chuỗi <code>displayId</code> dạng <code>S-135</code> bị tách thành hai token <code>s</code> + <code>135</code> vì dấu gạch ngang là ký tự phân tách. Chuỗi query <code>Noo's Question</code> cũng bị tách thành <code>noo</code> + <code>s</code> + <code>question</code> vì dấu nháy đơn cũng là ký tự phân tách. Hai bên trùng nhau ở token rác <code>s</code> — nên gần như mọi survey/poll có ID dạng <code>S-xxx</code> đều "khớp" một phần, dù nội dung không liên quan.</p>
+    <p><b>Quyết định:</b> giữ nguyên cơ chế <code>.withSearchIndex()</code> hiện tại — không can thiệp code. Xem lý do ở mục 04.</p>
+  </div>
+
+  <section>
+    <h2><span class="num">01</span> Convex full-text search hoạt động thế nào</h2>
+    <p class="sans">Các điểm dưới đây lấy trực tiếp từ tài liệu chính thức của Convex, vì đây là phần dễ hiểu nhầm nhất và là gốc rễ của vấn đề.</p>
+    <dl class="facts">
+      <dt>Tokenize</dt>
+      <dd>Văn bản được tách bằng <i>Tantivy SimpleTokenizer</i> — tách trên khoảng trắng <b>và dấu câu</b> (gồm <code>-</code>, <code>'</code>, v.v), sau đó lowercase. Mỗi token tối đa 32 ký tự.</dd>
+
+      <dt>Khớp nhiều từ</dt>
+      <dd>Tài liệu không nói "phải khớp toàn bộ từ". Convex "tách query thành các từ riêng và xếp hạng gần đúng các document khớp các từ này" — nghĩa là khớp <b>một phần</b> vẫn được trả về, chỉ xếp hạng thấp hơn khớp đầy đủ.</dd>
+
+      <dt>Prefix match</dt>
+      <dd>Chỉ từ <b>cuối cùng</b> trong query được prefix-match (hỗ trợ gõ tới đâu tìm tới đó). Các từ trước đó phải khớp chính xác (case-insensitive).</dd>
+
+      <dt>Fuzzy/typo</dt>
+      <dd>Đã <b>deprecated</b> kể từ 2025-01-15 — hiện tại không còn tự sửa lỗi chính tả như trước.</dd>
+
+      <dt>Relevance</dt>
+      <dd>Xếp hạng theo BM25 + số từ khớp, tần suất xuất hiện, độ dài field, độ gần nhau của các từ khớp.</dd>
+
+      <dt>Giới hạn index</dt>
+      <dd>Mỗi search index chỉ có đúng <b>1 search field</b>, tối đa 16 filter field (<code>.eq()</code>) — filter là so khớp tuyệt đối, áp dụng sau khi search index đã trả kết quả.</dd>
+    </dl>
+  </section>
+
+  <section>
+    <h3>Cách app đang dùng nó</h3>
+    <p class="sans">Field <code>searchContent</code> trên bảng <code>surveys</code> được ghép sẵn từ <code>displayId + title + module title/code</code> trong <a class="ref" href="#">SurveySearchContentHelper.buildSurveySearchContent</a> <span class="ref">surveySearchContent.helper.ts:13</span>, rồi được index bằng <code>.searchIndex('search_surveys', { searchField: 'searchContent' })</code>. Truy vấn thực hiện ở <span class="ref">survey.repo.ts:167-172</span> qua <code>.withSearchIndex(...).take(200)</code> trước khi cắt theo trang.</p>
+  </section>
+
+  <section>
+    <h2><span class="num">02</span> Vì sao va chạm token xảy ra</h2>
+    <p class="sans">Sơ đồ dưới minh hoạ đúng ví dụ trong screenshot: query <code>Noo's Question</code> so với hai document thật trong kết quả trả về.</p>
+    <div class="diagram">
+      <div class="diagram-row">
+        <div class="diagram-src"><div class="kind">Query</div><div class="label">Noo's Question</div></div>
+        <div class="chips">
+          <span class="chip hit">noo</span>
+          <span class="chip collide">s</span>
+          <span class="chip hit">question</span>
+        </div>
+        <div class="diagram-verdict">3 token tìm kiếm</div>
+      </div>
+      <div class="diagram-row">
+        <div class="diagram-src"><div class="kind">searchContent</div><div class="label">S-140 · Noo's question</div></div>
+        <div class="chips">
+          <span class="chip hit">s</span>
+          <span class="chip">140</span>
+          <span class="chip hit">noo</span>
+          <span class="chip hit">question</span>
+        </div>
+        <div class="diagram-verdict strong">Khớp mạnh — đúng ý</div>
+      </div>
+      <div class="diagram-row">
+        <div class="diagram-src"><div class="kind">searchContent</div><div class="label">S-135 · Survey Poll S-135</div></div>
+        <div class="chips">
+          <span class="chip collide">s</span>
+          <span class="chip">135</span>
+          <span class="chip">survey</span>
+          <span class="chip">poll</span>
+        </div>
+        <div class="diagram-verdict weak">Khớp yếu — chỉ trùng "s"</div>
+      </div>
+      <div class="diagram-caption">
+        Token <span class="chip collide">s</span> trong <code>Noo's</code> và token <span class="chip collide">s</span> tách ra từ <code>S-135</code> là <b>cùng một token</b> theo tokenizer. Vì matching không yêu cầu khớp hết, document thứ ba vẫn lọt vào kết quả — chỉ xếp hạng thấp hơn.
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h3>Đối chiếu với kết quả trong screenshot</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Tên</th><th>Token khớp</th><th>Vì sao xuất hiện</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="mono-id">S-140</td><td>Noo's question</td><td class="mono-id">noo, s, question</td><td><span class="pill good">Khớp đúng</span></td></tr>
+          <tr><td class="mono-id">S-146</td><td>Noo's question 1</td><td class="mono-id">noo, s, question</td><td><span class="pill good">Khớp đúng</span></td></tr>
+          <tr><td class="mono-id">S-145</td><td>Noo</td><td class="mono-id">noo, s</td><td><span class="pill good">Khớp đúng (tên)</span></td></tr>
+          <tr><td class="mono-id">S-147</td><td>Noo</td><td class="mono-id">noo, s</td><td><span class="pill good">Khớp đúng (tên)</span></td></tr>
+          <tr><td class="mono-id">S-135</td><td>Survey Poll S-135</td><td class="mono-id">s</td><td><span class="pill warn">Chỉ trùng "s" từ ID</span></td></tr>
+          <tr><td class="mono-id">S-134</td><td>Survey Poll 134</td><td class="mono-id">s</td><td><span class="pill warn">Chỉ trùng "s" từ ID</span></td></tr>
+          <tr><td class="mono-id">S-133</td><td>Survey Poll 133</td><td class="mono-id">s</td><td><span class="pill warn">Chỉ trùng "s" từ ID</span></td></tr>
+          <tr><td class="mono-id">S-132</td><td>Survey Poll Double Check</td><td class="mono-id">s</td><td><span class="pill warn">Chỉ trùng "s" từ ID</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">04</span> Vì sao không sửa</h2>
+    <p class="sans">Mọi cách can thiệp đều đụng vào chính cơ chế đang giữ cho tab Surveys/Polls nhanh, và đều đổi một rủi ro vận hành lấy một cải thiện nhỏ về độ chính xác:</p>
+    <dl class="facts">
+      <dt>Đổi searchContent</dt>
+      <dd>Bỏ dấu <code>-</code> trong <code>displayId</code> khi build lại field index sẽ vá đúng case <code>S-xxx</code>, nhưng là <b>thay đổi dữ liệu</b> đã lưu — cần backfill toàn bộ record cũ, và vẫn còn khả năng va chạm token khác trong tương lai (không triệt để).</dd>
+
+      <dt>Hậu kiểm in-memory</dt>
+      <dd>Lọc lại sau khi <code>.withSearchIndex()</code> trả kết quả vẫn phải chạy trên tập đã lấy về (<code>take(200)</code>) ở mọi lần search — thêm một bước xử lý trên request path, tức vẫn <b>ảnh hưởng hiệu năng</b>, chỉ là ở mức nhỏ hơn full scan.</dd>
+
+      <dt>Tách 2 field/2 query</dt>
+      <dd>Convex search index giới hạn đúng 1 search field, nên tách ID và nội dung nghĩa là 2 truy vấn song song + merge/rank thủ công — <b>phức tạp nhất</b> và vẫn cộng thêm round-trip, tức cũng ảnh hưởng hiệu năng.</dd>
+    </dl>
+    <p class="sans" style="margin-top:16px;">Nói cách khác: đây là <b>đặc thù kỹ thuật (trade-off) vốn có của <code>withSearchIndex</code></b> — Convex đánh đổi độ chính xác tuyệt đối lấy tốc độ, bằng cách xếp hạng theo số từ khớp thay vì lọc AND/substring đầy đủ. Giữ nguyên hành vi này là lựa chọn nhất quán với lý do ban đầu app dùng search index thay vì quét bảng.</p>
+  </section>
+
+  <footer>
+    Nguồn: Convex Developer Hub — Full Text Search (<a href="https://docs.convex.dev/search/text-search">docs.convex.dev/search/text-search</a>), truy xuất 2026-07-07.<br />
+    Tham chiếu code nội bộ: <code>convex/features/survey/helpers/surveySearchContent.helper.ts</code>, <code>convex/repositories/survey.repo.ts</code>, <code>convex/features/module/survey/survey.service.ts</code>.
+  </footer>
+
+</div>
