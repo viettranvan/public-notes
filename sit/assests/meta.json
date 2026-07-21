@@ -1,0 +1,25 @@
+{
+  "crawledAt": "2026-07-17T07:44:45.494Z",
+  "baseUrl": "https://xsitestg.singaporetech.edu.sg",
+  "apiVersion": "1.55",
+  "counts": {
+    "outypes": 0,
+    "semesters": 39,
+    "modules": 1930,
+    "courseTemplates": 1579,
+    "courseOfferings": 2361,
+    "moduleToOfferings": 1930,
+    "offeringAncestors": 2361,
+    "semesterToOfferings": 39
+  },
+  "typeIds": {
+    "organization": 1,
+    "courseTemplate": 2,
+    "courseOffering": 3,
+    "semester": 5,
+    "module": 101,
+    "school": 103
+  },
+  "skipAncestors": false,
+  "offeringSource": "module-descendants"
+}

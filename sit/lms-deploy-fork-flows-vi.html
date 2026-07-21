@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SIT Course Builder — Deploy &amp; Fork (Sync LMS) · Chi tiết</title>
+  <style>
+    :root {
+      --bg: #f6f4ef;
+      --surface: #ffffff;
+      --ink: #1c1917;
+      --muted: #57534e;
+      --line: #e7e5e4;
+      --brand: #9a3412;
+      --ok: #166534;
+      --ok-bg: #f0fdf4;
+      --warn: #9a3412;
+      --warn-bg: #fff7ed;
+      --bad: #991b1b;
+      --bad-bg: #fef2f2;
+      --info: #1e3a5f;
+      --info-bg: #eff6ff;
+      --neutral-bg: #f5f5f4;
+      --code: #292524;
+      --violet-bg: #f5f3ff;
+      --violet: #5b21b6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse 70% 45% at 0% 0%, #ffedd5 0%, transparent 55%),
+        var(--bg);
+      line-height: 1.55;
+    }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 2.25rem 1.25rem 4rem; }
+    header.hero {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 1.5rem 1.35rem;
+      margin-bottom: 1.1rem;
+    }
+    .eyebrow {
+      margin: 0 0 0.35rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--brand);
+    }
+    h1 {
+      margin: 0 0 0.55rem;
+      font-size: clamp(1.35rem, 3vw, 1.75rem);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+    .lede { margin: 0; color: var(--muted); max-width: 82ch; font-size: 0.95rem; }
+    .meta {
+      margin-top: 0.9rem;
+      display: flex; flex-wrap: wrap; gap: 0.4rem 0.75rem;
+      font-size: 0.82rem; color: var(--muted);
+      align-items: center;
+    }
+    .pill {
+      display: inline-block;
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border: 1px solid transparent;
+    }
+    .pill.ok { background: var(--ok-bg); color: var(--ok); border-color: #bbf7d0; }
+    .pill.warn { background: var(--warn-bg); color: var(--warn); border-color: #fed7aa; }
+    .pill.info { background: var(--info-bg); color: var(--info); border-color: #bfdbfe; }
+    nav.toc, .card, .glossary, .summary {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 1rem 1.15rem;
+      margin-bottom: 1rem;
+    }
+    .summary { background: var(--info-bg); border-color: #bfdbfe; }
+    .summary h2, .glossary h2, nav.toc strong {
+      margin: 0 0 0.5rem;
+      font-size: 1.02rem;
+    }
+    .card > h2 {
+      margin: 0 0 0.65rem;
+      font-size: 1.12rem;
+      letter-spacing: -0.01em;
+    }
+    .summary ul, .glossary dd, p, li { color: var(--muted); }
+    .summary ul { margin: 0; padding-left: 1.15rem; }
+    .summary li { margin-bottom: 0.35rem; }
+    nav.toc { font-size: 0.9rem; }
+    nav.toc ol { margin: 0; padding-left: 1.2rem; }
+    nav.toc li { margin-bottom: 0.25rem; }
+    nav.toc a { color: var(--info); text-decoration: none; }
+    nav.toc a:hover { text-decoration: underline; }
+    .glossary dl { margin: 0; }
+    .glossary dt { font-weight: 700; margin-top: 0.55rem; color: var(--ink); }
+    .glossary dd { margin: 0.15rem 0 0; font-size: 0.9rem; }
+    h2.section {
+      margin: 2rem 0 0.75rem;
+      font-size: 1.25rem;
+      letter-spacing: -0.01em;
+      border-bottom: 2px solid var(--line);
+      padding-bottom: 0.4rem;
+    }
+    h3 {
+      margin: 1.15rem 0 0.45rem;
+      font-size: 1rem;
+      color: var(--ink);
+    }
+    h4 {
+      margin: 0.9rem 0 0.35rem;
+      font-size: 0.92rem;
+      color: var(--ink);
+    }
+    p { margin: 0 0 0.7rem; font-size: 0.92rem; }
+    ul, ol { margin: 0 0 0.75rem; padding-left: 1.2rem; font-size: 0.92rem; }
+    li { margin-bottom: 0.35rem; }
+    strong { color: var(--ink); }
+    code, .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.84em;
+      background: var(--neutral-bg);
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+    }
+    .callout {
+      border-radius: 10px;
+      padding: 0.8rem 0.95rem;
+      margin: 0.75rem 0;
+      font-size: 0.9rem;
+    }
+    .callout.ok { background: var(--ok-bg); border-left: 4px solid var(--ok); }
+    .callout.warn { background: var(--warn-bg); border-left: 4px solid var(--brand); }
+    .callout.bad { background: var(--bad-bg); border-left: 4px solid var(--bad); }
+    .callout.info { background: var(--info-bg); border-left: 4px solid var(--info); }
+    .callout.violet { background: var(--violet-bg); border-left: 4px solid var(--violet); }
+    .callout .label {
+      display: block;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.25rem;
+      font-size: 0.82rem;
+    }
+    .diagram {
+      margin: 0.85rem 0 1rem;
+      padding: 1rem;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fafaf9;
+    }
+    .diagram .caption {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin: 0.65rem 0 0;
+      text-align: center;
+    }
+    .flow-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+    }
+    .flow-row + .flow-row { margin-top: 0.55rem; }
+    .box {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 0.55rem 0.7rem;
+      background: #fff;
+      font-size: 0.78rem;
+      text-align: center;
+      min-width: 6.8rem;
+      max-width: 16rem;
+      line-height: 1.35;
+    }
+    .box strong { display: block; font-size: 0.78rem; color: var(--ink); }
+    .box small { display: block; color: var(--muted); margin-top: 0.2rem; }
+    .box.ok { background: var(--ok-bg); border-color: #bbf7d0; }
+    .box.warn { background: var(--warn-bg); border-color: #fed7aa; }
+    .box.bad { background: var(--bad-bg); border-color: #fecaca; }
+    .box.info { background: var(--info-bg); border-color: #bfdbfe; }
+    .arrow { color: var(--muted); font-weight: 700; }
+    .arrow-down {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin: 0.45rem 0;
+      font-weight: 600;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+      margin: 0.75rem 0 0;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 0.55rem 0.65rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: var(--neutral-bg); font-size: 0.78rem; }
+    td { color: var(--muted); }
+    td strong { color: var(--ink); }
+    .tree {
+      margin: 0.75rem 0;
+      padding: 1rem 1.1rem;
+      background: var(--code);
+      color: #e7e5e4;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      line-height: 1.55;
+      overflow-x: auto;
+      white-space: pre;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .tree .c-ok { color: #86efac; }
+    .tree .c-bad { color: #fca5a5; }
+    .tree .c-warn { color: #fdba74; }
+    .tree .c-info { color: #93c5fd; }
+    .tag {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.12rem 0.45rem;
+      border-radius: 999px;
+      margin-right: 0.3rem;
+      vertical-align: middle;
+    }
+    .tag.ok { background: #dcfce7; color: var(--ok); }
+    .tag.warn { background: #ffedd5; color: var(--warn); }
+    .tag.info { background: #dbeafe; color: var(--info); }
+    .tag.bad { background: #fee2e2; color: var(--bad); }
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    .three-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.65rem;
+    }
+    .mini-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 0.75rem 0.85rem;
+      background: #fff;
+      font-size: 0.86rem;
+    }
+    .mini-card h4 { margin: 0 0 0.35rem; }
+    .mini-card p, .mini-card ul { margin: 0; font-size: 0.84rem; }
+    .mini-card ul { padding-left: 1.05rem; }
+    .steps {
+      counter-reset: step;
+      list-style: none;
+      padding-left: 0;
+    }
+    .steps > li {
+      position: relative;
+      padding: 0.75rem 0.85rem 0.75rem 3rem;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      margin-bottom: 0.55rem;
+    }
+    .steps > li::before {
+      counter-increment: step;
+      content: counter(step);
+      position: absolute;
+      left: 0.75rem;
+      top: 0.75rem;
+      width: 1.55rem;
+      height: 1.55rem;
+      border-radius: 999px;
+      background: var(--brand);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      padding-top: 0.15rem;
+    }
+    .steps > li strong.step-title {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-size: 0.9rem;
+    }
+    .decision {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 0.5rem;
+      align-items: stretch;
+      margin: 0.75rem 0;
+    }
+    .decision .mid {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--muted);
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      transform: rotate(180deg);
+    }
+    @media (max-width: 800px) {
+      .two-col, .three-col, .decision { grid-template-columns: 1fr; }
+      .decision .mid { writing-mode: horizontal-tb; transform: none; padding: 0.25rem 0; }
+    }
+    .sticky-note {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: #fff7ed;
+      border-bottom: 1px solid #fed7aa;
+      padding: 0.45rem 1rem;
+      font-size: 0.8rem;
+      color: var(--warn);
+      text-align: center;
+    }
+    footer {
+      margin-top: 1.75rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: center;
+    }
+    .src {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="sticky-note">
+    Tài liệu nội bộ · Đã chốt với client (Option A) · Dùng cho FE / BE / QA handoff
+  </div>
+
+  <div class="wrap">
+    <header class="hero">
+      <p class="eyebrow">Internal · Knowledge transfer · v2 chi tiết</p>
+      <h1>Deploy &amp; Fork — Sync to LMS</h1>
+      <p class="lede">
+        Tổng hợp đầy đủ 2 flow: <strong>Save → Deploy (sync roster)</strong> và
+        <strong>Set Up for New Trimester (Fork)</strong>, kèm timeline LMS, thuật toán lookup,
+        nhánh Perpetual, rule duplicate/lineage, ví dụ end-to-end và checklist QA.
+      </p>
+      <div class="meta">
+        <span class="pill ok">Client confirmed</span>
+        <span class="pill info">Module code = LMS type 101</span>
+        <span class="pill warn">Roster = Offering type 3</span>
+        <span>Cập nhật: 2026-07-21</span>
+      </div>
+    </header>
+
+    <section class="summary">
+      <h2>TL;DR — 8 ý bắt buộc nhớ</h2>
+      <ul>
+        <li><strong>Module code (CB)</strong> = <strong>LMS Module (type 101)</strong>, khóa qua mọi fork.</li>
+        <li><strong>Enrollment / roster</strong> chỉ lấy từ <strong>Course Offering (type 3)</strong> — Module 101 không có student list.</li>
+        <li><strong>Save</strong> chỉ verify 101 tồn tại; <strong>không</strong> cần Offering, <strong>không</strong> sync roster.</li>
+        <li><strong>Deploy</strong> mới resolve Offering + sync roster. Có trimester → search 4-digit; trống → Perpetual (semester ≠ 4-digit).</li>
+        <li>UI trimester = <strong>dropdown label</strong> (vd <code>AY 26/27 T1</code>); BE = <code>YY+T+0</code> (vd <code>2610</code>, không phải <code>2601</code>).</li>
+        <li><strong>MC code</strong> Priority 2 cũng match <strong>Module 101</strong> (không phải Offering 3).</li>
+        <li>N Offering khớp → <strong>merge roster</strong> (không hiện picker). 0 → block Deploy.</li>
+        <li><strong>Fork</strong>: chỉ module có trimester; tối đa 1 undeployed fork / lineage; cùng code trong lineage ≠ duplicate.</li>
+      </ul>
+    </section>
+
+    <nav class="toc">
+      <strong>Mục lục</strong>
+      <ol>
+        <li><a href="#glossary">Thuật ngữ &amp; hierarchy LMS</a></li>
+        <li><a href="#model">Mô hình Option A</a></li>
+        <li><a href="#timeline">Timeline thực tế (LMS vs CB)</a></li>
+        <li><a href="#fields">Field Deployment + Admin trimester</a></li>
+        <li><a href="#save">Flow Save — chi tiết từng bước</a></li>
+        <li><a href="#deploy">Flow Deploy — lookup &amp; roster</a></li>
+        <li><a href="#perpetual">Nhánh Perpetual</a></li>
+        <li><a href="#mc">MC code &amp; Priority 2</a></li>
+        <li><a href="#fork">Flow Fork — chi tiết</a></li>
+        <li><a href="#duplicate">Duplicate &amp; lineage</a></li>
+        <li><a href="#scenarios">Kịch bản end-to-end</a></li>
+        <li><a href="#ui">Gợi ý UI / state</a></li>
+        <li><a href="#errors">Bảng lỗi &amp; message</a></li>
+        <li><a href="#roles">FE / BE / QA — ai làm gì</a></li>
+        <li><a href="#qa">Checklist QA</a></li>
+        <li><a href="#open">Edge còn mở</a></li>
+      </ol>
+    </nav>
+
+    <!-- 1 -->
+    <h2 class="section" id="glossary">1. Thuật ngữ &amp; hierarchy LMS</h2>
+    <div class="glossary">
+      <h2>Định nghĩa</h2>
+      <dl>
+        <dt>LMS Module (type 101)</dt>
+        <dd>Org unit “Module” trên Brightspace (custom type của SIT). Là <strong>định nghĩa môn</strong>. Một Module có nhiều Offering theo kỳ. <strong>Không</strong> chứa roster học viên.</dd>
+        <dt>Course Offering / Coursesite (type 3)</dt>
+        <dd>Instance chạy thực tế dưới Module (thường gắn Semester). Đây là nơi có <strong>Students / enrollment</strong> để CB sync.</dd>
+        <dt>Semester (type 5)</dt>
+        <dd>Kỳ học trên LMS. Có thể là mã run 4 số (vd gắn trimester) hoặc <code>Semester_Ongoing</code> (perpetual).</dd>
+        <dt>Module code (CB UI)</dt>
+        <dd>Field user nhập khi Sync LMS. Map vào code của LMS Module 101. Giữ nguyên khi fork.</dd>
+        <dt>MC (Micro-credential)</dt>
+        <dd>Catalog do Admin tạo (code + title trống). Editor gắn module vào MC. MC code dùng Priority 2; cũng = Module 101 trên LMS.</dd>
+        <dt>Trimester / AY (CB)</dt>
+        <dd>Catalog do Admin tạo trong CB (không sync từ LMS). Dùng cho ngày start/end, deploy window, dashboard grouping, và key search Offering.</dd>
+        <dt>Perpetual</dt>
+        <dd>Sync LMS + trimester trống. Hợp lệ. Không fork. Offering chọn theo semester ≠ 4-digit.</dd>
+        <dt>Version lineage</dt>
+        <dd>Chuỗi gốc → các bản fork. Cùng lineage = cùng “dòng đời” module (cùng Module code qua các kỳ).</dd>
+        <dt>Undeployed fork</dt>
+        <dd>Bản fork đã tạo nhưng chưa Deploy thành công. Mỗi lineage chỉ 1 bản như vậy tại một thời điểm.</dd>
+      </dl>
+    </div>
+
+    <div class="card">
+      <h2>Hierarchy LMS (đã verify staging)</h2>
+      <div class="tree">Organization (1)     SIT
+  └─ Semester (5)      Ongoing · Code: Semester_Ongoing   <span class="c-warn">← perpetual</span>
+  └─ School (103)      …
+  └─ Module (101)      Code: INF1001                     <span class="c-info">← CB Module code</span>
+       └─ Course Template (2)   …
+            └─ Course Offering (3)  semester 2610         <span class="c-ok">← roster A</span>
+            └─ Course Offering (3)  semester 2620         <span class="c-ok">← roster B</span>
+            └─ Course Offering (3)  under Ongoing         <span class="c-ok">← roster perpetual</span></div>
+      <div class="callout bad">
+        <span class="label">Lỗi hiểu phổ biến — tránh</span>
+        Đừng map CB “Module code” = Offering code (type 3). Offering code thường khác Module code,
+        và mỗi Offering chỉ gắn 1 semester — không thể giữ nguyên code khi fork sang kỳ mới.
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <h2 class="section" id="model">2. Mô hình Option A (đã chốt)</h2>
+    <div class="card">
+      <p>
+        Client chọn: Module code = LMS Module 101, khóa trên mọi fork; mỗi fork Deploy tìm
+        coursesite mới qua <strong>Module code + trimester</strong>; roster theo Offering / CB version.
+      </p>
+      <div class="diagram">
+        <div class="flow-row">
+          <div class="box info"><strong>CB v1</strong><small>code INF1001<br />T = AY 26/27 T1</small></div>
+          <span class="arrow">→</span>
+          <div class="box"><strong>LMS 101</strong><small>INF1001</small></div>
+          <span class="arrow">→</span>
+          <div class="box ok"><strong>Offering</strong><small>2610 → roster A</small></div>
+        </div>
+        <div class="arrow-down">Fork (Set Up for New Trimester) — cùng Module code</div>
+        <div class="flow-row">
+          <div class="box info"><strong>CB v2</strong><small>code INF1001<br />T = AY 26/27 T2</small></div>
+          <span class="arrow">→</span>
+          <div class="box"><strong>cùng LMS 101</strong><small>INF1001</small></div>
+          <span class="arrow">→</span>
+          <div class="box ok"><strong>Offering mới</strong><small>2620 → roster B</small></div>
+        </div>
+        <p class="caption">v1 và v2 độc lập về roster. Student enrolled v1 không tự thấy v2.</p>
+      </div>
+      <div class="two-col">
+        <div class="mini-card">
+          <h4>CB sở hữu</h4>
+          <ul>
+            <li>Nội dung / version module</li>
+            <li>Catalog trimester + ngày</li>
+            <li>Binding: version ↔ Offering (sau Deploy)</li>
+            <li>Quyền truy cập theo roster đã sync</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <h4>LMS sở hữu</h4>
+          <ul>
+            <li>Module 101 (tạo sớm)</li>
+            <li>Offering 3 (thường ~2 tuần trước kỳ)</li>
+            <li>Enrollment thật trên Offering</li>
+            <li>Semester / Ongoing</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <h2 class="section" id="timeline">3. Timeline thực tế (LMS vs CB)</h2>
+    <div class="card">
+      <p>Đây là lý do bắt buộc tách <strong>Save</strong> và <strong>Deploy</strong>.</p>
+      <div class="tree">Thời gian ──────────────────────────────────────────────►
+
+[Sớm — trước kỳ lâu]
+  LMS:  Module 101 đã có (IT/admin)
+  CB:   Instructor Save Sync LMS
+        ✓ verify 101
+        ✗ chưa cần Offering
+        ✗ chưa sync roster
+
+[~2 tuần trước start trimester]
+  LMS:  Course Offering (3) được tạo + gắn semester 4-digit
+  CB:   Cửa sổ Deploy mở (rule 2 weeks)
+        Deploy: tìm Offering + sync roster
+        ✗ không thấy Offering → block + error
+
+[Trong kỳ]
+  CB module deployed; roster tiếp tục sync theo cơ chế sync hiện có
+  Instructor có thể Fork chuẩn bị kỳ sau (tạo undeployed fork)</div>
+      <div class="callout info">
+        <span class="label">Perpetual</span>
+        Không có “start trimester” → không áp cửa sổ 2 tuần theo cùng cách.
+        Deploy vẫn cần tìm được ≥1 Offering non-4-digit dưới Module 101.
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <h2 class="section" id="fields">4. Field Deployment + Admin trimester</h2>
+    <div class="card">
+      <h2>4.1 Form Module Details → Deployment (Sync LMS)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Field</th>
+            <th>Bắt buộc</th>
+            <th>UI control</th>
+            <th>Lưu / dùng khi nào</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Enrolment type</strong></td>
+            <td>Có</td>
+            <td>Select</td>
+            <td>Doc này = <code>Sync to LMS</code></td>
+          </tr>
+          <tr>
+            <td><strong>Module code</strong></td>
+            <td>Có</td>
+            <td>Text input</td>
+            <td>Save: verify 101. Deploy: P1 key.</td>
+          </tr>
+          <tr>
+            <td><strong>Micro-credential</strong></td>
+            <td>Không</td>
+            <td>Select từ list Admin</td>
+            <td>Save: fallback verify 101. Deploy: P2.</td>
+          </tr>
+          <tr>
+            <td><strong>Trimester</strong></td>
+            <td>Không</td>
+            <td><strong>Dropdown</strong> label thân thiện</td>
+            <td>Có giá trị = theo kỳ. Trống = Perpetual. Deploy dùng mã 4 số.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>4.2 Admin tạo trimester</h3>
+      <ul>
+        <li>UI Admin luôn hiện / nhập <strong>label thân thiện</strong> (vd <code>AY 26/27 T1</code>).</li>
+        <li>Backend convert &amp; store <strong>4-digit LMS run code</strong>: format <code>YY + T + 0</code>.</li>
+        <li>Ví dụ đúng: <code>2610</code> (AY26/27 · T1). <strong>Sai:</strong> <code>2601</code>.</li>
+        <li>Trimester còn mang <strong>startDate / endDate</strong> → deploy window, lock, dashboard Previous/Current.</li>
+      </ul>
+
+      <h3>4.3 Editable sau Deploy (nhắc lại product)</h3>
+      <table>
+        <thead>
+          <tr><th>Enrolment type</th><th>Sau khi Deploy</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Sync to LMS</strong></td>
+            <td>Không cho sửa enrolment / LMS mapping (locked).</td>
+          </tr>
+          <tr>
+            <td>SIT / Public</td>
+            <td>Vẫn cho đổi settings (ngoài scope chi tiết doc này).</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5 -->
+    <h2 class="section" id="save">5. Flow Save — chi tiết từng bước</h2>
+    <div class="card">
+      <h2>Mục tiêu Save</h2>
+      <p>
+        Lưu cấu hình enrolment + xác nhận Module identity trên LMS.
+        <strong>Không</strong> bind Offering. <strong>Không</strong> sync student list.
+      </p>
+
+      <ol class="steps">
+        <li>
+          <strong class="step-title">User điền form &amp; bấm Save</strong>
+          Enrolment = Sync LMS; Module code bắt buộc; MC optional; Trimester optional (dropdown).
+        </li>
+        <li>
+          <strong class="step-title">Validate CB — duplicate code</strong>
+          Tìm module khác trong CB có cùng Module code / MC code.
+          <ul>
+            <li>Cùng <strong>version lineage</strong> (gốc + các fork) → <strong>không</strong> coi là duplicate.</li>
+            <li>Khác lineage → lỗi: <em>“A module with this Module Code already exists.”</em></li>
+          </ul>
+        </li>
+        <li>
+          <strong class="step-title">Verify LMS Module (101)</strong>
+          Search LMS orgstructure / API cho Module type 101 có code =
+          <strong>Module code</strong> (ưu tiên) hoặc <strong>MC code</strong> nếu dùng fallback verify.
+          <ul>
+            <li>Không tìm thấy → lỗi: <em>“Module Code not found. Please verify the code in the LMS and try again.”</em></li>
+            <li>Tìm thấy → cho phép Save (có thể trả về title LMS để hiển thị / rename theo feedback UI cũ).</li>
+          </ul>
+        </li>
+        <li>
+          <strong class="step-title">Persist trên CB</strong>
+          Lưu enrolment type, moduleCode, mcId/code, trimesterId (nullable), trạng thái “saved / ready to deploy”.
+          Chưa có binding Offering id.
+        </li>
+      </ol>
+
+      <div class="callout ok">
+        <span class="label">Implication implement</span>
+        Save path phải gọi lookup <strong>Module (101)</strong>, không gọi
+        <code>findCourseOfferingByCode(moduleCode)</code> như model cũ (Offering-as-code).
+      </div>
+
+      <h3>Decision tree Save</h3>
+      <div class="tree">Save Sync LMS
+├─ duplicate code ngoài lineage? ──YES──► ERROR duplicate
+└─ NO
+   ├─ LMS Module 101 (moduleCode)? ──YES──► SAVE OK
+   └─ NO
+      ├─ có MC code &amp; LMS 101 (mcCode)? ──YES──► SAVE OK
+      └─ NO ──► ERROR module not found
+
+(Không search Offering. Không check trimester trên LMS.)</div>
+    </div>
+
+    <!-- 6 -->
+    <h2 class="section" id="deploy">6. Flow Deploy — lookup &amp; roster</h2>
+    <div class="card">
+      <h2>Mục tiêu Deploy</h2>
+      <p>
+        Resolve đúng Course Offering(s) trên LMS, bind vào CB version, sync enrollment theo role matrix.
+        Nếu 0 Offering → block.
+      </p>
+
+      <h3>6.1 Điều kiện trước Deploy (có trimester)</h3>
+      <ul>
+        <li>Module đã Save Sync LMS thành công.</li>
+        <li>Trong cửa sổ ~<strong>2 tuần trước</strong> <code>trimester.startDate</code>.</li>
+        <li>LMS đã có Offering cho kỳ đó (IT tạo — CB không tạo).</li>
+      </ul>
+
+      <h3>6.2 Thuật toán lookup (có trimester)</h3>
+      <ol class="steps">
+        <li>
+          <strong class="step-title">Chuẩn hóa trimester key</strong>
+          Từ dropdown selection → lấy mã 4 số đã store (vd <code>2610</code>).
+        </li>
+        <li>
+          <strong class="step-title">Priority 1 — Module code + trimester</strong>
+          Tìm Module 101 theo Module code → liệt kê Offering con → giữ Offering có semester code = <code>2610</code>
+          (hoặc tương đương mapping đã thống nhất).
+        </li>
+        <li>
+          <strong class="step-title">Priority 2 — MC code + trimester (fallback)</strong>
+          Nếu P1 = 0 Offering: lặp lại với MC code (cũng là Module 101) + cùng trimester.
+        </li>
+        <li>
+          <strong class="step-title">Xử lý kết quả</strong>
+          <ul>
+            <li><strong>0</strong> → block Deploy + error (Offering chưa có / sai code / sai kỳ).</li>
+            <li><strong>1</strong> → bind Offering đó; sync roster.</li>
+            <li><strong>N</strong> → merge roster tất cả Offering khớp; grant theo LMS–CB role mapping matrix.</li>
+          </ul>
+        </li>
+      </ol>
+
+      <div class="diagram">
+        <div class="flow-row">
+          <div class="box"><strong>Deploy</strong><small>có trimester</small></div>
+          <span class="arrow">→</span>
+          <div class="box info"><strong>P1</strong><small>Module code<br />+ 4-digit</small></div>
+          <span class="arrow">→</span>
+          <div class="box warn"><strong>P2</strong><small>MC code<br />+ 4-digit</small></div>
+          <span class="arrow">→</span>
+          <div class="box ok"><strong>Roster</strong><small>1 hoặc merge N</small></div>
+        </div>
+        <p class="caption">Lookup uniqueness không guarantee → luôn implement nhánh N = merge.</p>
+      </div>
+
+      <h3>6.3 Sau khi có Offering</h3>
+      <ul>
+        <li>Lưu binding: <code>cbModuleVersionId ↔ lmsOfferingId(s)</code>.</li>
+        <li>Kéo classlist / enrollment từ Offering.</li>
+        <li>Map role LMS → role CB theo matrix (Learner, Instructor, …).</li>
+        <li>User chỉ thấy CB version họ được grant — không nhảy sang fork khác.</li>
+      </ul>
+
+      <div class="callout warn">
+        <span class="label">Merge N Offerings</span>
+        Client xác nhận: gộp roster mọi Offering khớp.
+        Edge còn mở: cùng user khác role trên 2 Offering → cần rule resolve (priority / union) khi code.
+      </div>
+    </div>
+
+    <!-- 7 -->
+    <h2 class="section" id="perpetual">7. Nhánh Perpetual (trimester trống)</h2>
+    <div class="card">
+      <h2>Định nghĩa</h2>
+      <p>
+        Dropdown trimester <strong>không chọn</strong> → CB coi module là Perpetual.
+        Vẫn Sync LMS được. <strong>Không</strong> hiện / không cho Set Up for New Trimester.
+      </p>
+
+      <h3>7.1 Save</h3>
+      <p>Giống module có trimester: chỉ cần Module 101 tồn tại.</p>
+
+      <h3>7.2 Deploy — rule chọn Offering</h3>
+      <ol class="steps">
+        <li>
+          <strong class="step-title">Tìm Module 101</strong>
+          Theo Module code (rồi MC nếu fallback).
+        </li>
+        <li>
+          <strong class="step-title">Lọc Offering</strong>
+          Giữ Offering có <strong>semester code KHÔNG</strong> thuộc format 4-digit <code>YY+T+0</code>.
+          Ví dụ ứng viên: <code>Semester_Ongoing</code>, empty, text khác không phải run code kỳ.
+        </li>
+        <li>
+          <strong class="step-title">0 / 1 / N</strong>
+          Giống Deploy thường: 0 block; 1 sync; N merge roster.
+        </li>
+      </ol>
+
+      <h3>7.3 Ví dụ trực quan</h3>
+      <div class="tree">LMS Module 101 · INF1001
+├── Offering A · semester <span class="c-bad">2610</span>     → BỎ (là run code kỳ)
+├── Offering B · semester <span class="c-bad">2620</span>     → BỎ
+├── Offering C · semester <span class="c-ok">Ongoing</span>   → LẤY
+└── Offering D · semester <span class="c-ok">Open</span>      → LẤY (cũng ≠ 4-digit)
+
+CB: Sync LMS · Module code INF1001 · Trimester = (trống)
+Deploy → merge roster C + D → grant vào CB perpetual module
+(User không được UI “chọn enrollment” — hệ thống tự lọc)</div>
+
+      <div class="three-col">
+        <div class="mini-card">
+          <h4><span class="tag ok">OK</span> 1 non-term</h4>
+          <p>Sync đúng 1 Offering Ongoing.</p>
+        </div>
+        <div class="mini-card">
+          <h4><span class="tag warn">OK</span> N non-term</h4>
+          <p>Merge roster; không picker.</p>
+        </div>
+        <div class="mini-card">
+          <h4><span class="tag bad">Fail</span> 0 non-term</h4>
+          <p>Block Deploy + error.</p>
+        </div>
+      </div>
+
+      <div class="callout violet">
+        <span class="label">Khác biệt với “có trimester”</span>
+        Key không còn là <code>Module + 2610</code> mà là
+        <code>Module + (semester ∉ 4-digit set)</code>.
+        Instructor chỉ để trống dropdown — không nhập free-text semester LMS.
+      </div>
+    </div>
+
+    <!-- 8 -->
+    <h2 class="section" id="mc">8. MC code &amp; Priority 2</h2>
+    <div class="card">
+      <h2>Cách MC hoạt động</h2>
+      <ol>
+        <li>Admin tạo MC “rỗng”: MC code + title (chưa gắn module).</li>
+        <li>Editor gắn module vào MC từ list.</li>
+        <li>Deploy P1 fail → P2: search LMS <strong>Module 101</strong> bằng MC code + trimester (hoặc rule perpetual).</li>
+      </ol>
+      <div class="callout warn">
+        <span class="label">Đổi so với note cũ</span>
+        Trước đây từng hiểu MC = exact-match <strong>Offering (3)</strong>.
+        Client reply mới: MC = <strong>Module (101)</strong>, cùng kiểu Priority 1.
+      </div>
+      <h3>Hệ quả</h3>
+      <ul>
+        <li>Nhiều CB module cùng một MC code có thể Deploy P2 vào <strong>cùng Offering(s)</strong> → share roster (đã từng được product chấp nhận trong discussion cũ).</li>
+        <li>P2 không phải “nhảy thẳng tới 1 Offering code” nữa — vẫn phải + trimester / perpetual filter.</li>
+      </ul>
+    </div>
+
+    <!-- 9 -->
+    <h2 class="section" id="fork">9. Flow Fork — Set Up for New Trimester</h2>
+    <div class="card">
+      <h2>9.1 Ai được fork?</h2>
+      <table>
+        <thead>
+          <tr><th>Điều kiện</th><th>Được fork?</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Có trimester (không Perpetual)</td>
+            <td><strong>Có</strong></td>
+          </tr>
+          <tr>
+            <td>Perpetual (trimester trống)</td>
+            <td><strong>Không</strong></td>
+          </tr>
+          <tr>
+            <td>Enrolment = Sync LMS vs non-LMS</td>
+            <td><strong>Không liên quan</strong> — cả hai đều fork được nếu có trimester</td>
+          </tr>
+          <tr>
+            <td>Module thuộc / không thuộc MC</td>
+            <td><strong>Không liên quan</strong> — fork theo từng module</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>9.2 Gate: một undeployed fork / lineage</h3>
+      <ol class="steps">
+        <li>
+          <strong class="step-title">User bấm Set Up for New Trimester</strong>
+        </li>
+        <li>
+          <strong class="step-title">Kiểm tra lineage</strong>
+          Đã tồn tại fork cùng lineage ở trạng thái undeployed?
+          <ul>
+            <li><strong>Có</strong> → block action; dẫn user tới fork hiện có (không tạo thêm).</li>
+            <li><strong>Không</strong> → tiếp tục tạo.</li>
+          </ul>
+        </li>
+        <li>
+          <strong class="step-title">Tạo version mới</strong>
+          Clone nội dung theo rule fork product; <strong>giữ Module code</strong>;
+          gắn trimester mới (user chọn); enrolment/LMS settings kế thừa theo product;
+          trạng thái undeployed cho đến khi Deploy thành công.
+        </li>
+      </ol>
+
+      <div class="callout info">
+        <span class="label">Fork không tạo Offering LMS</span>
+        CB chỉ chuẩn bị version nội dung. Offering kỳ mới do IT LMS tạo.
+        Deploy version mới mới đi tìm Offering + sync roster kỳ mới.
+      </div>
+
+      <h3>9.3 Sau fork — Deploy version mới</h3>
+      <div class="tree">Lineage INF1001
+├── v1  T=AY25/26 T1 (2610)  DEPLOYED → Offering A · roster cũ
+└── v2  T=AY26/27 T1 (2610*) UNDEPLOYED (fork mới)
+        Save: OK — cùng Module code, cùng lineage ≠ duplicate
+        Deploy khi tới cửa sổ 2 tuần:
+          P1 INF1001 + trimester mới → Offering B
+          sync roster B vào v2
+          v1 vẫn giữ roster A</div>
+
+      <h3>9.4 Những gì fork thay đổi / không đổi</h3>
+      <div class="two-col">
+        <div class="mini-card">
+          <h4>Giữ nguyên</h4>
+          <ul>
+            <li>Module code (101)</li>
+            <li>Lineage identity</li>
+            <li>(Thường) Sync LMS flag / MC gắn — confirm khi impl nếu product có ngoại lệ</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <h4>Đổi / tách</h4>
+          <ul>
+            <li>Trimester mới</li>
+            <li>CB version mới (nội dung clone)</li>
+            <li>Offering + roster riêng sau Deploy</li>
+            <li>Enrollment học viên không mang từ version cũ</li>
+          </ul>
+        </div>
+      </div>
+      <p class="src">
+        Chi tiết “fork clone gì” (collaborator, history, staff copy) theo SRS/discussion cũ —
+        gate undeployed + who-can-fork lấy từ client reply mới nhất.
+      </p>
+    </div>
+
+    <!-- 10 -->
+    <h2 class="section" id="duplicate">10. Duplicate &amp; lineage</h2>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Tình huống</th>
+            <th>Cùng Module code?</th>
+            <th>Save OK?</th>
+            <th>Lý do</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Hai module độc lập (khác lineage)</td>
+            <td>Có</td>
+            <td><strong>Không</strong></td>
+            <td>Duplicate thật</td>
+          </tr>
+          <tr>
+            <td>v1 deployed + v2 fork cùng lineage</td>
+            <td>Có (bắt buộc)</td>
+            <td><strong>Có</strong></td>
+            <td>Cùng lineage ≠ duplicate</td>
+          </tr>
+          <tr>
+            <td>v2 undeployed đã tồn tại, tạo fork nữa</td>
+            <td>—</td>
+            <td>Fork <strong>blocked</strong></td>
+            <td>Max 1 undeployed / lineage</td>
+          </tr>
+          <tr>
+            <td>Module khác dùng lại code sau khi lineage cũ archived?</td>
+            <td colspan="3">Chưa chốt trong reply — cần Product nếu gặp case</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 11 -->
+    <h2 class="section" id="scenarios">11. Kịch bản end-to-end</h2>
+
+    <div class="card">
+      <h2><span class="tag ok">S1</span> Happy path — có trimester</h2>
+      <div class="tree">1. Admin tạo trimester “AY 26/27 T1” → BE store 2610 + start/end
+2. LMS đã có Module 101 code INF1001 (Offering chưa có)
+3. Editor Save: Module code INF1001, T=AY 26/27 T1 → verify 101 OK → saved
+4. ~2 tuần trước start: IT tạo Offering semester 2610 dưới INF1001
+5. Editor Deploy → P1 khớp 1 Offering → sync roster → deployed
+6. Cuối kỳ: Set Up for New Trimester → v2 (undeployed), cùng INF1001, chọn T2
+7. Tới cửa sổ T2: Deploy v2 → Offering 2620 → roster mới</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="tag ok">S2</span> Happy path — Perpetual</h2>
+      <div class="tree">1. Editor Save: INF1001, trimester trống → verify 101 OK
+2. LMS có Offering dưới Ongoing (semester ≠ 4-digit)
+3. Deploy → lọc non-4-digit → sync roster Ongoing
+4. UI không hiện “Set Up for New Trimester”</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="tag bad">S3</span> Save sớm nhưng Deploy sớm quá / Offering chưa có</h2>
+      <div class="tree">1. Save OK (101 có)
+2. Deploy trước khi IT tạo Offering HOẶC ngoài cửa sổ 2 tuần
+3. → block Deploy (0 Offering hoặc window rule)
+4. User đợi Offering / đúng cửa sổ rồi Deploy lại</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="tag bad">S4</span> Module code sai trên LMS</h2>
+      <div class="tree">Save → không tìm thấy 101
+→ “Module Code not found. Please verify the code in the LMS and try again.”
+→ không lưu Sync LMS thành công</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="tag warn">S5</span> Hai Offering cùng Module + trimester</h2>
+      <div class="tree">Deploy P1 trả về Offering X và Y (cùng 2610)
+→ merge roster X∪Y
+→ mọi user (sau map role) được access CB module version đó
+→ không hiện UI chọn X hay Y</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="tag warn">S6</span> Fork khi đã có undeployed</h2>
+      <div class="tree">v1 deployed, v2 undeployed đã tồn tại
+User bấm Set Up for New Trimester lần nữa
+→ block + deep-link / chỉ đường tới v2
+→ phải Deploy (hoặc hủy theo rule product) trước khi fork tiếp</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="tag info">S7</span> Priority 2 — Module code không ra Offering, MC có</h2>
+      <div class="tree">P1: Module code + 2610 → 0 Offering
+P2: MC code (101) + 2610 → 1 Offering
+→ Deploy OK bằng P2
+(Lưu ý: nhiều CB module cùng MC có thể share roster Offering đó)</div>
+    </div>
+
+    <!-- 12 -->
+    <h2 class="section" id="ui">12. Gợi ý UI / state</h2>
+    <div class="card">
+      <div class="two-col">
+        <div class="mini-card">
+          <h4>Trước Deploy (Sync LMS)</h4>
+          <ul>
+            <li>Form Module code / MC / Trimester editable</li>
+            <li>Save riêng với Deploy</li>
+            <li>Trimester = dropdown + option trống (Perpetual)</li>
+            <li>CTA Deploy disabled nếu ngoài window / chưa Save</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <h4>Sau Deploy (Sync LMS)</h4>
+          <ul>
+            <li>LMS mapping locked (Change Settings không mở lại Sync fields)</li>
+            <li>Hiện trạng thái linked / last sync nếu có</li>
+            <li>Fork CTA chỉ khi có trimester</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout info" style="margin-bottom:0">
+        <span class="label">Copy / UX đã từng request</span>
+        Đổi “Edit” → “Change Settings”; success Save có thể show Module code + LMS module name
+        (và rename CB title theo LMS) — thuộc feedback UI riêng, không contradict model này.
+      </div>
+    </div>
+
+    <!-- 13 -->
+    <h2 class="section" id="errors">13. Bảng lỗi &amp; message</h2>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Bước</th>
+            <th>Điều kiện</th>
+            <th>Message / hành vi (client)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Save</td>
+            <td>Duplicate code ngoài lineage</td>
+            <td><em>“A module with this Module Code already exists.”</em></td>
+          </tr>
+          <tr>
+            <td>Save</td>
+            <td>Không có LMS Module 101</td>
+            <td><em>“Module Code not found. Please verify the code in the LMS and try again.”</em></td>
+          </tr>
+          <tr>
+            <td>Fork</td>
+            <td>Đã có undeployed fork</td>
+            <td>Block + điều hướng tới fork hiện có</td>
+          </tr>
+          <tr>
+            <td>Deploy</td>
+            <td>0 Offering (term hoặc perpetual)</td>
+            <td>Block + error (Offering missing / mismatch)</td>
+          </tr>
+          <tr>
+            <td>Deploy</td>
+            <td>Ngoài cửa sổ 2 tuần (có trimester)</td>
+            <td>Block theo deploy-window rule</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 14 -->
+    <h2 class="section" id="roles">14. FE / BE / QA — ai làm gì</h2>
+    <div class="card">
+      <div class="three-col">
+        <div class="mini-card">
+          <h4>Frontend</h4>
+          <ul>
+            <li>Dropdown trimester + empty = perpetual</li>
+            <li>Ẩn fork khi perpetual</li>
+            <li>Message lỗi Save/Deploy/Fork</li>
+            <li>Deep-link undeployed fork</li>
+            <li>Lock fields sau Deploy Sync LMS</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <h4>Backend</h4>
+          <ul>
+            <li>Trimester: label ↔ 4-digit</li>
+            <li>Save: lookup Module 101</li>
+            <li>Deploy: P1/P2 + perpetual filter</li>
+            <li>Merge roster N</li>
+            <li>Lineage duplicate + undeployed gate</li>
+            <li>Bind Offering id(s) per version</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <h4>QA</h4>
+          <ul>
+            <li>Chạy S1–S7</li>
+            <li>Staging: 101 vs Offering code</li>
+            <li>Ongoing / 4-digit filter</li>
+            <li>Fork gate + same code Save</li>
+            <li>Deploy window 2 weeks</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 15 -->
+    <h2 class="section" id="qa">15. Checklist QA (copy nhanh)</h2>
+    <div class="card">
+      <ul>
+        <li>☐ Admin tạo trimester hiện label; DB/API có mã <code>2610</code> (không <code>2601</code>)</li>
+        <li>☐ Save với Module code = 101 thật → success; = Offering code → fail “not found” (nếu code khác)</li>
+        <li>☐ Save trùng code khác lineage → duplicate error</li>
+        <li>☐ Save trùng code cùng lineage (fork) → OK</li>
+        <li>☐ Deploy có T trước cửa sổ 2 tuần → blocked</li>
+        <li>☐ Deploy đúng cửa sổ, Offering có → roster đúng Offering đó</li>
+        <li>☐ Deploy 0 Offering → error, không partial grant</li>
+        <li>☐ Deploy N Offering cùng kỳ → user từ cả hai Offering vào được</li>
+        <li>☐ Perpetual: bỏ Offering 4-digit, lấy Ongoing</li>
+        <li>☐ Perpetual: không có CTA fork</li>
+        <li>☐ Fork lần 1 → tạo undeployed; Fork lần 2 → block + link v2</li>
+        <li>☐ Sau Deploy v2: v1 roster không đổi; v2 roster kỳ mới</li>
+        <li>☐ P2 MC = 101 + trimester khi P1 miss</li>
+        <li>☐ Sau Deploy Sync LMS: không edit lại Module code / trimester</li>
+      </ul>
+    </div>
+
+    <!-- 16 -->
+    <h2 class="section" id="open">16. Edge còn mở (không chặn bắt đầu impl)</h2>
+    <div class="card">
+      <table>
+        <thead>
+          <tr><th>Edge</th><th>Câu hỏi</th><th>Workaround tạm</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Perpetual semester shape</td>
+            <td>Field nào? Exact value <code>Ongoing</code> / <code>Semester_Ongoing</code> / empty?</td>
+            <td>Implement “không match regex 4-digit YY+T+0”; refine sau khi probe LMS</td>
+          </tr>
+          <tr>
+            <td>Merge role conflict</td>
+            <td>Cùng user 2 role trên 2 Offering?</td>
+            <td>Follow role matrix; nếu conflict → chọn role “cao hơn” (cần Product confirm)</td>
+          </tr>
+          <tr>
+            <td>Duplicate wording</td>
+            <td>Check Module code, MC code, hay cả hai? Message chỉ nói Module Code</td>
+            <td>Validate cả hai; message theo field đang conflict</td>
+          </tr>
+          <tr>
+            <td>Archived lineage reuse code</td>
+            <td>Module mới được dùng lại code cũ?</td>
+            <td>Hỏi Product khi gặp</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="callout ok" style="margin-bottom:0">
+        <span class="label">Kết luận cho team</span>
+        Model Save / Deploy / Fork / Perpetual đã đủ để bắt đầu design kỹ thuật &amp; ticket.
+        Các edge trên tinh chỉnh lúc implement + probe LMS, không đảo Option A.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>So sánh một trang</h2>
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Save</th>
+            <th>Deploy</th>
+            <th>Fork</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Input chính</strong></td>
+            <td>Module/MC code (±T)</td>
+            <td>Đã save + T hoặc perpetual rule</td>
+            <td>Module có T; lineage gate</td>
+          </tr>
+          <tr>
+            <td><strong>LMS 101?</strong></td>
+            <td>Bắt buộc (Sync)</td>
+            <td>Dùng để tìm Offering</td>
+            <td>Không bắt buộc lúc tạo fork</td>
+          </tr>
+          <tr>
+            <td><strong>LMS Offering 3?</strong></td>
+            <td>Không</td>
+            <td>Bắt buộc (≥1)</td>
+            <td>Không (Deploy sau mới cần)</td>
+          </tr>
+          <tr>
+            <td><strong>Sync roster?</strong></td>
+            <td>Không</td>
+            <td>Có (1 hoặc merge N)</td>
+            <td>Không</td>
+          </tr>
+          <tr>
+            <td><strong>Perpetual</strong></td>
+            <td>Cho phép</td>
+            <td>Cho phép</td>
+            <td>Cấm</td>
+          </tr>
+          <tr>
+            <td><strong>Module code</strong></td>
+            <td>Set / verify</td>
+            <td>Giữ</td>
+            <td>Giữ nguyên</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <footer>
+      SIT Course Builder · Internal handoff · Deploy &amp; Fork (Sync LMS) · chi tiết · 2026-07-21<br />
+      Nguồn: client confirmation reply + Option A + LMS staging hierarchy (type 101 / 3 / Semester_Ongoing)
+    </footer>
+  </div>
+</body>
+</html>

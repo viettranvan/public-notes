@@ -1,4 +1,9 @@
-<title>SIT Org Structure Explorer</title>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SIT LMS Org Explorer — Module (101) → Offering</title>
 <style>
   :root {
     color-scheme: light;
@@ -8,15 +13,16 @@
     --ink-secondary: #52514e;
     --ink-muted: #898781;
     --grid: #e1e0d9;
-    --baseline: #c3c2b7;
     --border: rgba(11,11,11,0.10);
     --hover: rgba(11,11,11,0.045);
     --mark-bg: #ffe89a;
     --mark-ink: #3a2e00;
-    --color-cluster: #2a78d6;
-    --color-programme: #008300;
+    --color-module: #7c3aed;
+    --color-offering: #eda100;
     --color-semester: #e87ba4;
-    --color-course: #eda100;
+    --color-template: #0d9488;
+    --color-ok: #166534;
+    --color-warn: #9a3412;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -27,15 +33,14 @@
       --ink-secondary: #c3c2b7;
       --ink-muted: #898781;
       --grid: #2c2c2a;
-      --baseline: #383835;
       --border: rgba(255,255,255,0.10);
       --hover: rgba(255,255,255,0.06);
       --mark-bg: #5a4300;
       --mark-ink: #ffe89a;
-      --color-cluster: #3987e5;
-      --color-programme: #008300;
+      --color-module: #a78bfa;
+      --color-offering: #c98500;
       --color-semester: #d55181;
-      --color-course: #c98500;
+      --color-template: #2dd4bf;
     }
   }
   * { box-sizing: border-box; }
@@ -46,310 +51,237 @@
     font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
     line-height: 1.45;
   }
-  .page {
-    max-width: 1300px;
-    margin: 0 auto;
-    padding: 28px 20px 60px;
+  .page { max-width: 1300px; margin: 0 auto; padding: 28px 20px 60px; }
+  h1 { font-size: 22px; margin: 0 0 6px; }
+  .subtitle { margin: 0 0 18px; color: var(--ink-secondary); font-size: 13.5px; max-width: 70ch; }
+  .subtitle code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.9em;
+    background: var(--hover);
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
   }
-  h1 { font-size: 22px; margin: 0 0 20px; }
-
+  .banner {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1e3a5f;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  @media (prefers-color-scheme: dark) {
+    .banner { background: #0c1a2e; border-color: #1e3a5f; color: #93c5fd; }
+  }
   .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
     gap: 10px;
     margin-bottom: 10px;
   }
-  .stats-grid.secondary { margin-bottom: 20px; }
+  .stats-grid.secondary { margin-bottom: 18px; }
   .stat-tile {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 10px 14px;
-    border-top: 3px solid var(--tile-color, var(--baseline));
+    border-top: 3px solid var(--tile-color, var(--grid));
   }
   .stat-tile .label {
     font-size: 11px;
     color: var(--ink-muted);
     text-transform: uppercase;
     letter-spacing: .04em;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    display: flex; align-items: center; gap: 6px;
   }
   .stat-tile .value {
-    font-size: 26px;
-    font-weight: 600;
-    color: var(--ink-primary);
-    font-variant-numeric: tabular-nums;
-    margin-top: 2px;
+    font-size: 26px; font-weight: 600;
+    font-variant-numeric: tabular-nums; margin-top: 2px;
   }
-  .rel-dots { display: inline-flex; align-items: center; gap: 3px; }
-  .rel-dots .dot { width: 7px; height: 7px; }
-
   .legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin-bottom: 18px;
-    font-size: 13px;
-    color: var(--ink-secondary);
+    display: flex; flex-wrap: wrap; gap: 16px;
+    margin-bottom: 16px; font-size: 13px; color: var(--ink-secondary);
   }
-  .legend .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
   .controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: center;
-    justify-content: space-between;
+    display: flex; flex-wrap: wrap; gap: 12px;
+    align-items: center; justify-content: space-between;
     margin-bottom: 14px;
   }
   .tabs {
-    display: flex;
-    gap: 2px;
-    background: var(--page);
-    border: 1px solid var(--border);
-    padding: 3px;
-    border-radius: 9px;
+    display: flex; gap: 2px; flex-wrap: wrap;
+    background: var(--page); border: 1px solid var(--border);
+    padding: 3px; border-radius: 9px;
   }
   .tab-btn {
-    font: inherit;
-    font-size: 13px;
-    padding: 7px 13px;
-    border: none;
-    border-radius: 6px;
-    background: transparent;
-    color: var(--ink-secondary);
-    cursor: pointer;
+    font: inherit; font-size: 13px; padding: 7px 12px;
+    border: none; border-radius: 6px; background: transparent;
+    color: var(--ink-secondary); cursor: pointer;
   }
   .tab-btn[aria-selected="true"] {
-    background: var(--surface);
-    color: var(--ink-primary);
+    background: var(--surface); color: var(--ink-primary);
     box-shadow: 0 1px 2px var(--border);
   }
-  .search-row {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex: 1;
-    min-width: 260px;
-  }
+  .search-row { display: flex; gap: 10px; align-items: center; flex: 1; min-width: 260px; }
   .search-wrap { position: relative; flex: 1; min-width: 200px; }
   .search-wrap input[type="search"] {
-    width: 100%;
-    font: inherit;
-    font-size: 13px;
-    padding: 8px 60px 8px 12px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--surface);
-    color: var(--ink-primary);
+    width: 100%; font: inherit; font-size: 13px;
+    padding: 8px 60px 8px 12px; border: 1px solid var(--border);
+    border-radius: 8px; background: var(--surface); color: var(--ink-primary);
   }
   .search-wrap input[type="search"]::-webkit-search-cancel-button { display: none; }
   .search-clear {
-    position: absolute;
-    right: 6px;
-    top: 50%;
-    transform: translateY(-50%);
-    border: none;
-    background: transparent;
-    color: var(--ink-muted);
-    cursor: pointer;
-    font-size: 16px;
-    padding: 4px 6px;
-    line-height: 1;
+    position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+    border: none; background: transparent; color: var(--ink-muted);
+    cursor: pointer; font-size: 16px; padding: 4px 6px;
   }
-  .match-counter {
-    font-size: 12px;
-    color: var(--ink-muted);
-    white-space: nowrap;
-  }
-  .tree-actions { display: flex; gap: 6px; }
+  .match-counter { font-size: 12px; color: var(--ink-muted); white-space: nowrap; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+  .filters label { font-size: 12.5px; color: var(--ink-secondary); display: flex; align-items: center; gap: 6px; }
   .ghost-btn {
-    font: inherit;
-    font-size: 12px;
-    padding: 7px 10px;
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    background: var(--surface);
-    color: var(--ink-secondary);
-    cursor: pointer;
+    font: inherit; font-size: 12px; padding: 7px 10px;
+    border: 1px solid var(--border); border-radius: 7px;
+    background: var(--surface); color: var(--ink-secondary); cursor: pointer;
   }
   .ghost-btn:hover { background: var(--hover); }
 
-  .main-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
+  .main-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
   @media (min-width: 900px) {
     .main-grid { grid-template-columns: 2fr 1fr; align-items: start; }
     .detail-panel { position: sticky; top: 16px; }
   }
-
-  .tree-panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px;
-    max-height: 74vh;
-    overflow-y: auto;
-    overflow-x: hidden;
+  .tree-panel, .detail-panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px;
+    max-height: 74vh; overflow-y: auto;
   }
   .quality-panel { max-height: none; }
+  .detail-panel { padding: 16px; }
 
   ul.tree-root, ul.children { list-style: none; margin: 0; padding-left: 0; }
   ul.children {
-    padding-left: 18px;
-    margin-left: 9px;
-    border-left: 1px dashed var(--grid);
-    display: none;
+    padding-left: 18px; margin-left: 9px;
+    border-left: 1px dashed var(--grid); display: none;
   }
   li.node.expanded > ul.children { display: block; }
 
   .row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 5px 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    min-width: 0;
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 8px; border-radius: 6px; cursor: pointer; min-width: 0;
   }
   .row:hover { background: var(--hover); }
-  .row:focus-visible { outline: 2px solid var(--color-cluster); outline-offset: -2px; }
-
   .toggle {
-    width: 14px;
-    flex-shrink: 0;
-    text-align: center;
-    color: var(--ink-muted);
-    font-size: 10px;
-    display: inline-block;
+    width: 14px; flex-shrink: 0; text-align: center;
+    color: var(--ink-muted); font-size: 10px;
     transition: transform .12s ease;
   }
   li.node.expanded > .row > .toggle { transform: rotate(90deg); }
-
-  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-
   .label { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 7px; overflow: hidden; }
   .label .name {
-    color: var(--ink-primary);
-    font-weight: 500;
-    font-size: 13.5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    color: var(--ink-primary); font-weight: 500; font-size: 13.5px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .label .code {
-    color: var(--ink-muted);
-    font-size: 11.5px;
-    white-space: nowrap;
-    flex-shrink: 0;
+    color: var(--ink-muted); font-size: 11.5px; white-space: nowrap; flex-shrink: 0;
   }
   .count {
-    color: var(--ink-muted);
-    font-size: 11.5px;
-    font-variant-numeric: tabular-nums;
-    flex-shrink: 0;
-    white-space: nowrap;
+    color: var(--ink-muted); font-size: 11.5px;
+    font-variant-numeric: tabular-nums; flex-shrink: 0;
   }
+  .badge {
+    font-size: 10px; font-weight: 700; padding: 1px 6px;
+    border-radius: 999px; flex-shrink: 0;
+  }
+  .badge.term { background: #fce7f3; color: #9d174d; }
+  .badge.ongoing { background: #ede9fe; color: #5b21b6; }
+  .badge.multi { background: #ffedd5; color: #9a3412; }
   mark { background: var(--mark-bg); color: var(--mark-ink); border-radius: 2px; padding: 0 1px; }
-
-  .group-row .name { font-style: italic; color: var(--ink-secondary); }
 
   .quality-groups { display: flex; flex-direction: column; gap: 18px; }
   .quality-group h3 { font-size: 14px; margin: 0 0 8px; }
   .muted-note { color: var(--ink-muted); font-size: 13px; margin: 0 0 8px; }
-  ul.flat-list { max-height: 240px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; padding: 4px; }
+  ul.flat-list { max-height: 280px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; padding: 4px; }
 
-  .detail-panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px;
-    max-height: 74vh;
-    overflow-y: auto;
-  }
   .detail-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
   .detail-nav-btn {
-    border: 1px solid var(--border);
-    background: var(--page);
-    color: var(--ink-secondary);
-    border-radius: 6px;
-    width: 26px;
-    height: 26px;
-    cursor: pointer;
-    font-size: 13px;
+    border: 1px solid var(--border); background: var(--page);
+    color: var(--ink-secondary); border-radius: 6px;
+    width: 26px; height: 26px; cursor: pointer;
   }
   .detail-nav-btn:disabled { opacity: .35; cursor: default; }
   .detail-type-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: var(--ink-secondary);
-    text-transform: uppercase;
-    letter-spacing: .04em;
-    margin-bottom: 6px;
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--ink-secondary);
+    text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px;
   }
   .detail-name { font-size: 17px; margin: 0 0 10px; }
-  .detail-meta { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 0 0 14px; font-size: 12.5px; }
+  .detail-meta {
+    display: grid; grid-template-columns: auto 1fr;
+    gap: 4px 12px; margin: 0 0 14px; font-size: 12.5px;
+  }
   .detail-meta dt { color: var(--ink-muted); }
-  .detail-meta dd { margin: 0; color: var(--ink-primary); word-break: break-word; }
-  .detail-meta dd.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px; color: var(--ink-secondary); }
+  .detail-meta dd { margin: 0; word-break: break-word; }
+  .detail-meta dd.mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11.5px; color: var(--ink-secondary);
+  }
   .related-section { margin-bottom: 14px; }
   .related-section h4 { font-size: 12.5px; margin: 0 0 6px; color: var(--ink-secondary); }
-  .pill-list { display: flex; flex-wrap: wrap; gap: 6px; max-height: 160px; overflow-y: auto; }
+  .pill-list { display: flex; flex-wrap: wrap; gap: 6px; max-height: 200px; overflow-y: auto; }
   .pill {
-    font: inherit;
-    font-size: 12px;
-    padding: 4px 9px;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--pill-color, var(--baseline));
-    background: var(--page);
-    color: var(--ink-primary);
-    cursor: pointer;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    font: inherit; font-size: 12px; padding: 4px 9px; border-radius: 999px;
+    border: 1px solid var(--border); border-left: 3px solid var(--pill-color, var(--grid));
+    background: var(--page); color: var(--ink-primary); cursor: pointer;
+    max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
   .pill:hover { background: var(--hover); }
-  .detail-placeholder { color: var(--ink-muted); font-size: 13px; }
+  .detail-placeholder, .error-box { color: var(--ink-muted); font-size: 13px; }
+  .error-box { color: #991b1b; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px; }
+  .loading { padding: 24px; text-align: center; color: var(--ink-muted); }
 </style>
-
+</head>
+<body>
 <div class="page">
-  <h1>SIT Org Structure Explorer</h1>
+  <h1>SIT LMS Org Explorer</h1>
+  <p class="subtitle">
+    Cây theo crawl Brightspace staging: <strong>Module (type 101)</strong> →
+    <strong>Course Offering (type 3)</strong>, kèm Semester.
+    Dữ liệu từ <code>raw/</code> sau khi chạy <code>crawl-orgstructure.mjs</code>.
+  </p>
+  <div class="banner" id="meta-banner">Đang tải dữ liệu crawl…</div>
 
   <div class="stats-grid" id="stats-primary"></div>
   <div class="stats-grid secondary" id="stats-relations"></div>
-
   <div class="legend" id="legend"></div>
 
   <div class="controls">
     <div class="tabs" role="tablist" id="tabs">
-      <button class="tab-btn" data-tab="cluster" aria-selected="true">Cluster ▸ Programme ▸ Course</button>
-      <button class="tab-btn" data-tab="semester" aria-selected="false">Semester ▸ Course</button>
+      <button class="tab-btn" data-tab="module" aria-selected="true">Module ▸ Offering</button>
+      <button class="tab-btn" data-tab="semester" aria-selected="false">Semester ▸ Offering</button>
       <button class="tab-btn" data-tab="quality" aria-selected="false">Data Quality</button>
     </div>
     <div class="search-row">
       <div class="search-wrap">
-        <input type="search" id="search-input" placeholder="Tìm theo tên, mã, hoặc ID…" autocomplete="off" />
-        <button class="search-clear" id="search-clear" title="Xóa tìm kiếm">×</button>
+        <input type="search" id="search-input" placeholder="Tìm tên, code, ID…" autocomplete="off" />
+        <button class="search-clear" id="search-clear" title="Xóa">×</button>
       </div>
       <span class="match-counter" id="match-counter"></span>
-      <div class="tree-actions">
-        <button class="ghost-btn" id="expand-all">Mở hết</button>
-        <button class="ghost-btn" id="collapse-all">Thu gọn</button>
-      </div>
+      <button class="ghost-btn" id="expand-all">Mở hết</button>
+      <button class="ghost-btn" id="collapse-all">Thu gọn</button>
     </div>
+  </div>
+
+  <div class="filters" id="module-filters">
+    <label><input type="checkbox" id="filter-has-offerings" checked /> Chỉ module có Offering</label>
+    <label><input type="checkbox" id="filter-multi-only" /> Chỉ module ≥2 Offering</label>
+    <label><input type="checkbox" id="filter-multi-sem" /> Module code span ≥2 semester</label>
   </div>
 
   <div class="main-grid">
     <div>
-      <div class="tree-panel" data-tab="cluster" id="panel-cluster"></div>
+      <div class="tree-panel" data-tab="module" id="panel-module"><div class="loading">Loading…</div></div>
       <div class="tree-panel" data-tab="semester" id="panel-semester" hidden></div>
       <div class="tree-panel quality-panel" data-tab="quality" id="panel-quality" hidden></div>
     </div>
@@ -358,73 +290,141 @@
         <button class="detail-nav-btn" id="detail-back" disabled>←</button>
         <button class="detail-nav-btn" id="detail-forward" disabled>→</button>
       </div>
-      <div id="detail-body"><p class="detail-placeholder">Chọn một mục trong cây bên trái để xem chi tiết và các quan hệ liên quan.</p></div>
+      <div id="detail-body"><p class="detail-placeholder">Chọn một mục trong cây để xem chi tiết.</p></div>
     </div>
   </div>
 </div>
 
 <script>
 (async function () {
-  const [clusters, programmes, semesters, courses,
-         mapClusterProgramme, mapClusterCourse, mapProgrammeCourse, mapSemesterCourse] = await Promise.all([
-    'assests/clusterDump.json',
-    'assests/programmeDump.json',
-    'assests/semesterDump.json',
-    'assests/courseDump.json',
-    'assests/map_cluster_programme.json',
-    'assests/map_cluster_course.json',
-    'assests/map_programme_course.json',
-    'assests/map_semester_course.json',
-  ].map(url => fetch(url).then(res => res.json())));
+  const FOUR_DIGIT = /^\d{4}$/;
 
-  function indexBy(arr) {
-    const m = new Map();
-    for (const item of arr) m.set(item.Identifier, item);
-    return m;
-  }
-  const clusterById = indexBy(clusters);
-  const programmeById = indexBy(programmes);
-  const semesterById = indexBy(semesters);
-  const courseById = indexBy(courses);
-
-  function buildAdjacency(pairs, parentKey, childKey) {
-    const forward = new Map();
-    const backward = new Map();
-    for (const p of pairs) {
-      const pid = p[parentKey], cid = p[childKey];
-      if (!forward.has(pid)) forward.set(pid, []);
-      forward.get(pid).push(cid);
-      if (!backward.has(cid)) backward.set(cid, []);
-      backward.get(cid).push(pid);
-    }
-    return { forward, backward };
+  function isFourDigitSemester(code) {
+    return FOUR_DIGIT.test(String(code || '').trim());
   }
 
-  const clusterProgramme = buildAdjacency(mapClusterProgramme, 'clusterId', 'programmeId');
-  const clusterCourse = buildAdjacency(mapClusterCourse, 'clusterId', 'courseId');
-  const programmeCourse = buildAdjacency(mapProgrammeCourse, 'programmeId', 'courseId');
-  const semesterCourse = buildAdjacency(mapSemesterCourse, 'semesterId', 'courseId');
+  async function loadJson(url) {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`${url} → HTTP ${res.status}`);
+    return res.json();
+  }
 
-  const TYPE_META = {
-    cluster: { label: 'Cluster', color: 'var(--color-cluster)', entities: clusterById },
-    programme: { label: 'Programme', color: 'var(--color-programme)', entities: programmeById },
-    semester: { label: 'Semester', color: 'var(--color-semester)', entities: semesterById },
-    course: { label: 'Course', color: 'var(--color-course)', entities: courseById },
-  };
+  let modules, offerings, semesters, moduleToOfferings, offeringAncestors, semesterToOfferings, meta, report;
+  try {
+    [
+      modules,
+      offerings,
+      semesters,
+      moduleToOfferings,
+      offeringAncestors,
+      semesterToOfferings,
+      meta,
+      report,
+    ] = await Promise.all([
+      loadJson('raw/modules.json'),
+      loadJson('raw/course-offerings.json'),
+      loadJson('raw/semesters.json'),
+      loadJson('raw/module-to-offerings.json'),
+      loadJson('raw/offering-ancestors.json').catch(() => []),
+      loadJson('raw/semester-to-offerings.json'),
+      loadJson('raw/meta.json').catch(() => null),
+      loadJson('analysis/report.json').catch(() => null),
+    ]);
+  } catch (err) {
+    document.getElementById('meta-banner').outerHTML =
+      `<div class="error-box"><strong>Không tải được raw crawl.</strong><br/>${escapeHtml(err.message)}<br/><br/>Chạy: <code>node secrets/crawl/crawl-orgstructure.mjs</code> rồi mở lại file này qua local server (file:// có thể bị CORS).</div>`;
+    return;
+  }
 
   function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    return String(s ?? '').replace(/[&<>"']/g, c => (
+      { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+    ));
   }
   function highlight(text, query) {
     const raw = String(text || '');
     if (!query) return escapeHtml(raw);
     const idx = raw.toLowerCase().indexOf(query);
     if (idx === -1) return escapeHtml(raw);
-    return escapeHtml(raw.slice(0, idx)) + '<mark>' + escapeHtml(raw.slice(idx, idx + query.length)) + '</mark>' + escapeHtml(raw.slice(idx + query.length));
+    return escapeHtml(raw.slice(0, idx))
+      + '<mark>' + escapeHtml(raw.slice(idx, idx + query.length)) + '</mark>'
+      + escapeHtml(raw.slice(idx + query.length));
+  }
+  function indexBy(arr) {
+    const m = new Map();
+    for (const item of arr) m.set(String(item.Identifier), item);
+    return m;
   }
 
-  function createNodeLi(type, id, { hasChildren = false, extraCountLabel = null } = {}) {
-    const entity = TYPE_META[type].entities.get(id);
+  const moduleById = indexBy(modules);
+  const offeringById = indexBy(offerings);
+  const semesterById = indexBy(semesters);
+
+  // Enrich offerings with module/semester from ancestors
+  const offeringMeta = new Map();
+  for (const row of offeringAncestors) {
+    const oid = String(row.offering?.Identifier);
+    offeringMeta.set(oid, {
+      module: row.module,
+      semester: row.semester,
+      template: row.template,
+    });
+  }
+
+  const moduleOfferingsForward = new Map();
+  for (const row of moduleToOfferings) {
+    moduleOfferingsForward.set(
+      String(row.module.Identifier),
+      (row.offerings || []).map(o => String(o.Identifier)),
+    );
+  }
+
+  const semesterOfferingsForward = new Map();
+  for (const row of semesterToOfferings) {
+    semesterOfferingsForward.set(
+      String(row.semester.Identifier),
+      (row.offerings || []).map(o => String(o.Identifier)),
+    );
+  }
+
+  // Module code → distinct semester codes (from ancestors)
+  const moduleCodeSemesters = new Map();
+  for (const row of offeringAncestors) {
+    const mCode = row.module?.Code || '';
+    if (!mCode) continue;
+    if (!moduleCodeSemesters.has(mCode)) moduleCodeSemesters.set(mCode, new Set());
+    const sc = row.semester?.Code || row.semester?.Name;
+    if (sc) moduleCodeSemesters.get(mCode).add(sc);
+  }
+  const multiSemModuleCodes = new Set(
+    [...moduleCodeSemesters.entries()].filter(([, s]) => s.size > 1).map(([c]) => c),
+  );
+
+  const TYPE_META = {
+    module: { label: 'Module (101)', color: 'var(--color-module)', entities: moduleById },
+    offering: { label: 'Course Offering (3)', color: 'var(--color-offering)', entities: offeringById },
+    semester: { label: 'Semester (5)', color: 'var(--color-semester)', entities: semesterById },
+  };
+
+  const crawledAt = meta?.crawledAt || report?.generatedAt || '—';
+  const counts = meta?.counts || report?.totals || {};
+  document.getElementById('meta-banner').innerHTML =
+    `Crawl: <strong>${escapeHtml(crawledAt)}</strong>`
+    + (meta?.baseUrl ? ` · ${escapeHtml(meta.baseUrl)}` : '')
+    + ` · Modules <strong>${(counts.modules ?? modules.length).toLocaleString()}</strong>`
+    + ` · Offerings <strong>${(counts.courseOfferings ?? offerings.length).toLocaleString()}</strong>`
+    + ` · Semesters <strong>${(counts.semesters ?? semesters.length).toLocaleString()}</strong>`;
+
+  function semesterBadge(semCode) {
+    if (!semCode) return '';
+    if (isFourDigitSemester(semCode)) {
+      return `<span class="badge term" title="4-digit run code">${escapeHtml(semCode)}</span>`;
+    }
+    return `<span class="badge ongoing" title="Non-4-digit (perpetual candidate)">${escapeHtml(semCode)}</span>`;
+  }
+
+  function createNodeLi(type, id, { hasChildren = false, extraCountLabel = null, extraHtml = '' } = {}) {
+    const entity = TYPE_META[type].entities.get(String(id));
     const li = document.createElement('li');
     li.className = 'node ' + type + (hasChildren ? '' : ' leaf');
     const searchText = `${entity?.Name || ''} ${entity?.Code || ''} ${id}`.toLowerCase();
@@ -433,7 +433,7 @@
     const row = document.createElement('div');
     row.className = 'row';
     row.tabIndex = 0;
-    row.title = `${entity?.Name || '(unknown)'}${entity?.Code ? ' · ' + entity.Code : ''} · ID ${id}${entity?.Path ? '\n' + entity.Path : ''}`;
+    row.title = `${entity?.Name || '(unknown)'}${entity?.Code ? ' · ' + entity.Code : ''} · ID ${id}`;
 
     const toggle = document.createElement('span');
     toggle.className = 'toggle';
@@ -447,13 +447,11 @@
 
     const label = document.createElement('span');
     label.className = 'label';
-
     const nameSpan = document.createElement('span');
     nameSpan.className = 'name';
     nameSpan.dataset.raw = entity?.Name || `(#${id})`;
     nameSpan.textContent = nameSpan.dataset.raw;
     label.appendChild(nameSpan);
-
     if (entity?.Code) {
       const codeSpan = document.createElement('span');
       codeSpan.className = 'code';
@@ -463,6 +461,12 @@
     }
     row.appendChild(label);
 
+    if (extraHtml) {
+      const wrap = document.createElement('span');
+      wrap.innerHTML = extraHtml;
+      row.appendChild(wrap);
+    }
+
     if (extraCountLabel) {
       const count = document.createElement('span');
       count.className = 'count';
@@ -471,7 +475,6 @@
     }
 
     li.appendChild(row);
-
     row.addEventListener('click', () => {
       if (hasChildren) li.classList.toggle('expanded');
       showDetail(type, id);
@@ -479,74 +482,75 @@
     row.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); }
     });
-
     return li;
   }
 
-  function nameOf(type, id) { return TYPE_META[type].entities.get(id)?.Name || ''; }
-  function byName(type) { return (a, b) => nameOf(type, a).localeCompare(nameOf(type, b)); }
+  function nameOf(type, id) {
+    return TYPE_META[type].entities.get(String(id))?.Name || '';
+  }
+  function byName(type) {
+    return (a, b) => nameOf(type, a).localeCompare(nameOf(type, b));
+  }
 
-  function buildClusterTree() {
+  function offeringSemesterCode(oid) {
+    return offeringMeta.get(String(oid))?.semester?.Code
+      || offeringMeta.get(String(oid))?.semester?.Name
+      || '';
+  }
+
+  function buildModuleTree() {
+    const onlyWith = document.getElementById('filter-has-offerings').checked;
+    const onlyMulti = document.getElementById('filter-multi-only').checked;
+    const onlyMultiSem = document.getElementById('filter-multi-sem').checked;
+
     const root = document.createElement('ul');
     root.className = 'tree-root';
-    const sortedClusters = [...clusters].sort((a, b) => a.Name.localeCompare(b.Name));
 
-    for (const cluster of sortedClusters) {
-      const programmeIds = clusterProgramme.forward.get(cluster.Identifier) || [];
-      const directCourseIds = clusterCourse.forward.get(cluster.Identifier) || [];
+    const sorted = [...modules].sort((a, b) => (a.Name || '').localeCompare(b.Name || ''));
+    let shown = 0;
 
-      const viaProgrammeCourseIds = new Set();
-      for (const pid of programmeIds) {
-        for (const cid of (programmeCourse.forward.get(pid) || [])) viaProgrammeCourseIds.add(cid);
-      }
-      const directOnly = directCourseIds.filter(cid => !viaProgrammeCourseIds.has(cid));
-      const totalCourses = new Set([...viaProgrammeCourseIds, ...directCourseIds]).size;
-      const hasChildren = programmeIds.length > 0 || directOnly.length > 0;
+    for (const mod of sorted) {
+      const mid = String(mod.Identifier);
+      const oids = moduleOfferingsForward.get(mid) || [];
+      if (onlyWith && oids.length === 0) continue;
+      if (onlyMulti && oids.length < 2) continue;
+      if (onlyMultiSem && !multiSemModuleCodes.has(mod.Code || '')) continue;
 
-      const li = createNodeLi('cluster', cluster.Identifier, {
+      const hasChildren = oids.length > 0;
+      const multiBadge = oids.length > 1
+        ? '<span class="badge multi">' + oids.length + ' offr</span>'
+        : '';
+      const spanSem = multiSemModuleCodes.has(mod.Code || '')
+        ? '<span class="badge multi" title="Module code xuất hiện ở nhiều semester">multi-sem</span>'
+        : '';
+
+      const li = createNodeLi('module', mid, {
         hasChildren,
-        extraCountLabel: `${programmeIds.length} chương trình · ${totalCourses} môn`
+        extraCountLabel: `${oids.length} offering`,
+        extraHtml: multiBadge + spanSem,
       });
 
       if (hasChildren) {
-        const childUl = document.createElement('ul');
-        childUl.className = 'children';
-
-        for (const pid of [...programmeIds].sort(byName('programme'))) {
-          const courseIds = programmeCourse.forward.get(pid) || [];
-          const pHasChildren = courseIds.length > 0;
-          const pLi = createNodeLi('programme', pid, { hasChildren: pHasChildren, extraCountLabel: `${courseIds.length} môn` });
-          if (pHasChildren) {
-            const cUl = document.createElement('ul');
-            cUl.className = 'children';
-            for (const cid of [...courseIds].sort(byName('course'))) cUl.appendChild(createNodeLi('course', cid));
-            pLi.appendChild(cUl);
-          }
-          childUl.appendChild(pLi);
+        const ul = document.createElement('ul');
+        ul.className = 'children';
+        for (const oid of [...oids].sort(byName('offering'))) {
+          const semCode = offeringSemesterCode(oid);
+          const oLi = createNodeLi('offering', oid, {
+            extraHtml: semesterBadge(semCode),
+          });
+          ul.appendChild(oLi);
         }
-
-        if (directOnly.length > 0) {
-          const groupLi = document.createElement('li');
-          groupLi.className = 'node group leaf-group';
-          const groupRow = document.createElement('div');
-          groupRow.className = 'row group-row';
-          groupRow.innerHTML =
-            '<span class="toggle">▸</span>' +
-            '<span class="dot" style="background:var(--ink-muted)"></span>' +
-            '<span class="label"><span class="name">Gắn trực tiếp (không qua chương trình)</span></span>' +
-            `<span class="count">${directOnly.length} môn</span>`;
-          groupLi.appendChild(groupRow);
-          const gUl = document.createElement('ul');
-          gUl.className = 'children';
-          for (const cid of [...directOnly].sort(byName('course'))) gUl.appendChild(createNodeLi('course', cid));
-          groupLi.appendChild(gUl);
-          groupRow.addEventListener('click', () => groupLi.classList.toggle('expanded'));
-          childUl.appendChild(groupLi);
-        }
-
-        li.appendChild(childUl);
+        li.appendChild(ul);
       }
       root.appendChild(li);
+      shown += 1;
+    }
+
+    if (shown === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'muted-note';
+      empty.textContent = 'Không có module khớp filter.';
+      root.appendChild(empty);
     }
     return root;
   }
@@ -557,13 +561,27 @@
     const sorted = [...semesters].sort((a, b) => Number(a.Identifier) - Number(b.Identifier));
 
     for (const sem of sorted) {
-      const courseIds = semesterCourse.forward.get(sem.Identifier) || [];
-      const hasChildren = courseIds.length > 0;
-      const li = createNodeLi('semester', sem.Identifier, { hasChildren, extraCountLabel: `${courseIds.length} môn` });
+      const sid = String(sem.Identifier);
+      const oids = semesterOfferingsForward.get(sid) || [];
+      const hasChildren = oids.length > 0;
+      const li = createNodeLi('semester', sid, {
+        hasChildren,
+        extraCountLabel: `${oids.length} offering`,
+        extraHtml: semesterBadge(sem.Code || sem.Name || ''),
+      });
       if (hasChildren) {
         const ul = document.createElement('ul');
         ul.className = 'children';
-        for (const cid of [...courseIds].sort(byName('course'))) ul.appendChild(createNodeLi('course', cid));
+        for (const oid of [...oids].sort(byName('offering'))) {
+          const metaO = offeringMeta.get(String(oid));
+          const modCode = metaO?.module?.Code || '';
+          const oLi = createNodeLi('offering', oid, {
+            extraHtml: modCode
+              ? `<span class="badge multi" title="Parent Module code">${escapeHtml(modCode)}</span>`
+              : '',
+          });
+          ul.appendChild(oLi);
+        }
         li.appendChild(ul);
       }
       root.appendChild(li);
@@ -571,109 +589,191 @@
     return root;
   }
 
-  function computeOrphans() {
-    return {
-      programmesNoCluster: programmes.filter(p => !clusterProgramme.backward.has(p.Identifier)),
-      coursesNoCluster: courses.filter(c => !clusterCourse.backward.has(c.Identifier)),
-      coursesNoProgramme: courses.filter(c => !programmeCourse.backward.has(c.Identifier)),
-      coursesNoSemester: courses.filter(c => !semesterCourse.backward.has(c.Identifier)),
-      coursesMultiProgramme: courses.filter(c => (programmeCourse.backward.get(c.Identifier) || []).length > 1),
-      coursesMultiCluster: courses.filter(c => (clusterCourse.backward.get(c.Identifier) || []).length > 1),
-      coursesMultiSemester: courses.filter(c => (semesterCourse.backward.get(c.Identifier) || []).length > 1),
-    };
-  }
-
-  function buildDataQualityView() {
-    const o = computeOrphans();
+  function buildQualityView() {
     const root = document.createElement('div');
     root.className = 'quality-groups';
+
+    const multiOff = moduleToOfferings
+      .filter(r => r.offeringCount > 1)
+      .sort((a, b) => b.offeringCount - a.offeringCount);
+
+    const multiSemList = [...moduleCodeSemesters.entries()]
+      .filter(([, s]) => s.size > 1)
+      .map(([code, sems]) => ({ code, semesters: [...sems], count: sems.size }))
+      .sort((a, b) => b.count - a.count);
+
+    const codeDiff = offeringAncestors.filter(r =>
+      r.module && r.offering && r.module.Code !== r.offering.Code
+    );
+    const codeSame = offeringAncestors.filter(r =>
+      r.module && r.offering && r.module.Code === r.offering.Code
+    );
+    const missingMod = offeringAncestors.filter(r => !r.module);
+    const nonFourDigit = offeringAncestors.filter(r => {
+      const c = r.semester?.Code || '';
+      return c && !isFourDigitSemester(c);
+    });
+    const fourDigit = offeringAncestors.filter(r =>
+      isFourDigitSemester(r.semester?.Code || '')
+    );
+
     const groups = [
-      { type: 'programme', title: 'Programme không gắn Cluster nào', items: o.programmesNoCluster },
-      { type: 'course', title: 'Course không gắn Cluster nào', items: o.coursesNoCluster },
-      { type: 'course', title: 'Course không gắn Programme nào', items: o.coursesNoProgramme },
-      { type: 'course', title: 'Course không gắn Semester nào', items: o.coursesNoSemester },
-      { type: 'course', title: 'Course gắn ≥ 2 Programme', items: o.coursesMultiProgramme },
-      { type: 'course', title: 'Course gắn ≥ 2 Cluster', items: o.coursesMultiCluster },
-      { type: 'course', title: 'Course gắn ≥ 2 Semester', items: o.coursesMultiSemester },
+      {
+        title: `Module có ≥ 2 Offering descendants (${multiOff.length})`,
+        note: 'Hỗ trợ Option A: 1 Module code → nhiều coursesite theo kỳ.',
+        render: () => {
+          const ul = document.createElement('ul');
+          ul.className = 'tree-root flat-list';
+          for (const row of multiOff.slice(0, 200)) {
+            ul.appendChild(createNodeLi('module', row.module.Identifier, {
+              extraCountLabel: `${row.offeringCount} offering`,
+            }));
+          }
+          return ul;
+        },
+      },
+      {
+        title: `Module code span ≥ 2 semester (${multiSemList.length})`,
+        note: 'Claim Linh: cùng Module code qua nhiều trimester.',
+        render: () => {
+          const wrap = document.createElement('div');
+          if (!multiSemList.length) {
+            wrap.innerHTML = '<p class="muted-note">Không có.</p>';
+            return wrap;
+          }
+          const ul = document.createElement('ul');
+          ul.className = 'tree-root flat-list';
+          for (const row of multiSemList.slice(0, 200)) {
+            const mods = modules.filter(m => m.Code === row.code);
+            for (const m of mods) {
+              ul.appendChild(createNodeLi('module', m.Identifier, {
+                extraCountLabel: row.semesters.join(', '),
+              }));
+            }
+          }
+          wrap.appendChild(ul);
+          return wrap;
+        },
+      },
+      {
+        title: `Offering Code ≠ Module Code (${codeDiff.length} / ${offeringAncestors.length})`,
+        note: `Same code: ${codeSame.length}. Missing module ancestor: ${missingMod.length}.`,
+        render: () => {
+          const ul = document.createElement('ul');
+          ul.className = 'tree-root flat-list';
+          for (const row of codeDiff.slice(0, 150)) {
+            ul.appendChild(createNodeLi('offering', row.offering.Identifier, {
+              extraCountLabel: `mod ${row.module.Code}`,
+            }));
+          }
+          return ul;
+        },
+      },
+      {
+        title: `Semester 4-digit (term) vs non-4-digit (perpetual candidates)`,
+        note: `4-digit: ${fourDigit.length} · non-4-digit: ${nonFourDigit.length}`,
+        render: () => {
+          const wrap = document.createElement('div');
+          const ul = document.createElement('ul');
+          ul.className = 'tree-root flat-list';
+          const bySem = new Map();
+          for (const row of nonFourDigit) {
+            const key = row.semester?.Code || row.semester?.Name || '(empty)';
+            if (!bySem.has(key)) bySem.set(key, []);
+            bySem.get(key).push(row);
+          }
+          for (const [code, rows] of [...bySem.entries()].sort((a, b) => b[1].length - a[1].length)) {
+            const li = document.createElement('li');
+            li.className = 'node leaf';
+            li.innerHTML = `<div class="row"><span class="dot" style="background:var(--color-semester)"></span><span class="label"><span class="name">${escapeHtml(code)}</span></span><span class="count">${rows.length} offering</span></div>`;
+            ul.appendChild(li);
+          }
+          wrap.appendChild(ul);
+          return wrap;
+        },
+      },
     ];
+
     for (const g of groups) {
       const section = document.createElement('div');
       section.className = 'quality-group';
       const h = document.createElement('h3');
-      h.textContent = `${g.title} (${g.items.length})`;
+      h.textContent = g.title;
       section.appendChild(h);
-      if (g.items.length === 0) {
+      if (g.note) {
         const p = document.createElement('p');
         p.className = 'muted-note';
-        p.textContent = 'Không có.';
+        p.textContent = g.note;
         section.appendChild(p);
-      } else {
-        const ul = document.createElement('ul');
-        ul.className = 'tree-root flat-list';
-        for (const item of [...g.items].sort((a, b) => a.Name.localeCompare(b.Name))) {
-          ul.appendChild(createNodeLi(g.type, item.Identifier));
-        }
-        section.appendChild(ul);
       }
+      section.appendChild(g.render());
       root.appendChild(section);
     }
     return root;
   }
 
-  document.getElementById('panel-cluster').appendChild(buildClusterTree());
+  function rebuildModulePanel() {
+    const panel = document.getElementById('panel-module');
+    panel.innerHTML = '';
+    panel.appendChild(buildModuleTree());
+    applySearch();
+  }
+
+  document.getElementById('panel-module').innerHTML = '';
+  document.getElementById('panel-module').appendChild(buildModuleTree());
   document.getElementById('panel-semester').appendChild(buildSemesterTree());
-  document.getElementById('panel-quality').appendChild(buildDataQualityView());
+  document.getElementById('panel-quality').appendChild(buildQualityView());
 
-  // --- Stat tiles ---
-  const statsPrimary = document.getElementById('stats-primary');
-  const primaryTiles = [
-    { type: 'cluster', label: 'Cluster', value: clusters.length },
-    { type: 'programme', label: 'Programme', value: programmes.length },
-    { type: 'semester', label: 'Semester', value: semesters.length },
-    { type: 'course', label: 'Course', value: courses.length },
-  ];
-  statsPrimary.innerHTML = primaryTiles.map(t => `
-    <div class="stat-tile" style="--tile-color:${TYPE_META[t.type].color}">
-      <div class="label"><span class="dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${TYPE_META[t.type].color}"></span>${t.label}</div>
+  ['filter-has-offerings', 'filter-multi-only', 'filter-multi-sem'].forEach(id => {
+    document.getElementById(id).addEventListener('change', rebuildModulePanel);
+  });
+
+  // Stats
+  const modulesWithOff = moduleToOfferings.filter(r => r.offeringCount > 0).length;
+  const modulesMulti = moduleToOfferings.filter(r => r.offeringCount > 1).length;
+  document.getElementById('stats-primary').innerHTML = [
+    { label: 'Module (101)', value: modules.length, color: 'var(--color-module)' },
+    { label: 'Course Offering (3)', value: offerings.length, color: 'var(--color-offering)' },
+    { label: 'Semester (5)', value: semesters.length, color: 'var(--color-semester)' },
+    { label: 'Module có Offering', value: modulesWithOff, color: 'var(--color-ok)' },
+  ].map(t => `
+    <div class="stat-tile" style="--tile-color:${t.color}">
+      <div class="label"><span class="dot" style="background:${t.color}"></span>${t.label}</div>
       <div class="value">${t.value.toLocaleString()}</div>
     </div>
   `).join('');
 
-  const statsRelations = document.getElementById('stats-relations');
-  const relationTiles = [
-    { from: 'cluster', to: 'programme', label: 'Cluster → Programme', value: mapClusterProgramme.length },
-    { from: 'cluster', to: 'course', label: 'Cluster → Course', value: mapClusterCourse.length },
-    { from: 'programme', to: 'course', label: 'Programme → Course', value: mapProgrammeCourse.length },
-    { from: 'semester', to: 'course', label: 'Semester → Course', value: mapSemesterCourse.length },
-  ];
-  statsRelations.innerHTML = relationTiles.map(t => `
+  document.getElementById('stats-relations').innerHTML = [
+    { label: 'Module ≥ 2 Offering', value: modulesMulti },
+    { label: 'Module code multi-sem', value: multiSemModuleCodes.size },
+    { label: 'Offering≠Module code', value: offeringAncestors.filter(r => r.module && r.offering && r.module.Code !== r.offering.Code).length },
+    { label: 'Ancestor rows', value: offeringAncestors.length },
+  ].map(t => `
     <div class="stat-tile">
-      <div class="label">
-        <span class="rel-dots">
-          <span class="dot" style="background:${TYPE_META[t.from].color}"></span>
-          <span class="dot" style="background:${TYPE_META[t.to].color}"></span>
-        </span>
-        ${t.label}
-      </div>
+      <div class="label">${t.label}</div>
       <div class="value">${t.value.toLocaleString()}</div>
     </div>
   `).join('');
 
-  document.getElementById('legend').innerHTML = Object.entries(TYPE_META).map(([key, meta]) => `
-    <span class="legend-item"><span class="dot" style="width:9px;height:9px;border-radius:50%;background:${meta.color}"></span>${meta.label}</span>
-  `).join('');
+  document.getElementById('legend').innerHTML = Object.entries(TYPE_META).map(([, meta]) => `
+    <span class="legend-item"><span class="dot" style="width:9px;height:9px;background:${meta.color}"></span>${meta.label}</span>
+  `).join('') + `
+    <span class="legend-item"><span class="badge term">2610</span> trimester 4-digit</span>
+    <span class="legend-item"><span class="badge ongoing">Ongoing</span> perpetual candidate</span>
+  `;
 
-  // --- Tabs ---
+  // Tabs
   const tabs = document.querySelectorAll('.tab-btn');
   const panels = document.querySelectorAll('.tree-panel');
+  const filtersEl = document.getElementById('module-filters');
   tabs.forEach(btn => btn.addEventListener('click', () => {
     tabs.forEach(b => b.setAttribute('aria-selected', b === btn ? 'true' : 'false'));
     panels.forEach(p => { p.hidden = p.dataset.tab !== btn.dataset.tab; });
+    filtersEl.style.display = btn.dataset.tab === 'module' ? '' : 'none';
     applySearch();
   }));
   function activePanel() { return document.querySelector('.tree-panel:not([hidden])'); }
 
-  // --- Expand / Collapse all ---
   document.getElementById('expand-all').addEventListener('click', () => {
     activePanel().querySelectorAll('li.node').forEach(li => {
       if (li.querySelector(':scope > ul.children')) li.classList.add('expanded');
@@ -683,7 +783,6 @@
     activePanel().querySelectorAll('li.node').forEach(li => li.classList.remove('expanded'));
   });
 
-  // --- Search ---
   const searchInput = document.getElementById('search-input');
   const matchCounter = document.getElementById('match-counter');
   let searchTimer = null;
@@ -702,101 +801,150 @@
     const panel = activePanel();
     if (!panel) return;
     const allLis = panel.querySelectorAll('li.node');
-
     if (!query) {
       allLis.forEach(li => { li.style.display = ''; });
-      panel.querySelectorAll('.name, .code').forEach(el => { el.innerHTML = escapeHtml(el.dataset.raw || el.textContent); });
+      panel.querySelectorAll('.name, .code').forEach(el => {
+        if (el.dataset.raw != null) el.innerHTML = escapeHtml(el.dataset.raw);
+      });
       matchCounter.textContent = '';
       return;
     }
-
     const matches = new Set();
     allLis.forEach(li => {
       if ((li.dataset.search || '').includes(query)) matches.add(li);
     });
-
     const keep = new Set(matches);
     matches.forEach(li => {
       let p = li.parentElement && li.parentElement.closest('li.node');
       while (p) { keep.add(p); p = p.parentElement && p.parentElement.closest('li.node'); }
     });
-
     allLis.forEach(li => {
       if (keep.has(li)) {
         li.style.display = '';
         if (!matches.has(li) && li.querySelector(':scope > ul.children')) li.classList.add('expanded');
-      } else {
-        li.style.display = 'none';
-      }
+      } else li.style.display = 'none';
     });
-
     panel.querySelectorAll('.name, .code').forEach(el => {
-      el.innerHTML = highlight(el.dataset.raw, query);
+      if (el.dataset.raw != null) el.innerHTML = highlight(el.dataset.raw, query);
     });
-
     matchCounter.textContent = `${matches.size} kết quả`;
   }
 
-  // --- Detail panel ---
   let detailHistory = [];
   let detailIndex = -1;
-
   function updateHistoryButtons() {
     document.getElementById('detail-back').disabled = detailIndex <= 0;
     document.getElementById('detail-forward').disabled = detailIndex >= detailHistory.length - 1;
   }
   document.getElementById('detail-back').addEventListener('click', () => {
-    if (detailIndex > 0) { detailIndex--; renderDetail(detailHistory[detailIndex].type, detailHistory[detailIndex].id); updateHistoryButtons(); }
+    if (detailIndex > 0) {
+      detailIndex--;
+      renderDetail(detailHistory[detailIndex].type, detailHistory[detailIndex].id);
+      updateHistoryButtons();
+    }
   });
   document.getElementById('detail-forward').addEventListener('click', () => {
-    if (detailIndex < detailHistory.length - 1) { detailIndex++; renderDetail(detailHistory[detailIndex].type, detailHistory[detailIndex].id); updateHistoryButtons(); }
+    if (detailIndex < detailHistory.length - 1) {
+      detailIndex++;
+      renderDetail(detailHistory[detailIndex].type, detailHistory[detailIndex].id);
+      updateHistoryButtons();
+    }
   });
 
   function showDetail(type, id) {
     detailHistory = detailHistory.slice(0, detailIndex + 1);
-    detailHistory.push({ type, id });
+    detailHistory.push({ type, id: String(id) });
     detailIndex = detailHistory.length - 1;
     renderDetail(type, id);
     updateHistoryButtons();
   }
 
-  function relatedSection(title, ids, type) {
-    if (!ids.length) return `<div class="related-section"><h4>${title} (0)</h4><p class="muted-note">Không có.</p></div>`;
-    const sorted = [...ids].sort(byName(type));
-    const pills = sorted.map(rid => {
-      const e = TYPE_META[type].entities.get(rid);
-      return `<button class="pill" data-nav-type="${type}" data-nav-id="${escapeHtml(rid)}" style="--pill-color:${TYPE_META[type].color}" title="${escapeHtml(e?.Name || '')}">${escapeHtml(e?.Name || ('#' + rid))}</button>`;
-    }).join('');
-    return `<div class="related-section"><h4>${title} (${ids.length})</h4><div class="pill-list">${pills}</div></div>`;
+  function relatedSection(title, items) {
+    if (!items.length) {
+      return `<div class="related-section"><h4>${title} (0)</h4><p class="muted-note">Không có.</p></div>`;
+    }
+    const pills = items.map(({ type, id, label }) =>
+      `<button class="pill" data-nav-type="${type}" data-nav-id="${escapeHtml(id)}" style="--pill-color:${TYPE_META[type].color}">${escapeHtml(label)}</button>`
+    ).join('');
+    return `<div class="related-section"><h4>${title} (${items.length})</h4><div class="pill-list">${pills}</div></div>`;
   }
 
   function renderDetail(type, id) {
-    const entity = TYPE_META[type].entities.get(id);
+    id = String(id);
+    const entity = TYPE_META[type]?.entities.get(id);
     const panel = document.getElementById('detail-body');
-    if (!entity) { panel.innerHTML = '<p class="muted-note">Không tìm thấy.</p>'; return; }
+    if (!entity) {
+      panel.innerHTML = '<p class="muted-note">Không tìm thấy.</p>';
+      return;
+    }
 
     let relatedHtml = '';
-    if (type === 'cluster') {
-      relatedHtml += relatedSection('Chương trình (Programme)', clusterProgramme.forward.get(id) || [], 'programme');
-      relatedHtml += relatedSection('Môn học trực tiếp (Course)', clusterCourse.forward.get(id) || [], 'course');
-    } else if (type === 'programme') {
-      relatedHtml += relatedSection('Thuộc Cluster', clusterProgramme.backward.get(id) || [], 'cluster');
-      relatedHtml += relatedSection('Môn học (Course)', programmeCourse.forward.get(id) || [], 'course');
+    let extraMeta = '';
+
+    if (type === 'module') {
+      const oids = moduleOfferingsForward.get(id) || [];
+      const semSet = moduleCodeSemesters.get(entity.Code || '') || new Set();
+      relatedHtml += relatedSection('Course Offerings', oids.map(oid => {
+        const o = offeringById.get(oid);
+        const sc = offeringSemesterCode(oid);
+        return {
+          type: 'offering',
+          id: oid,
+          label: `${o?.Name || oid}${sc ? ' · ' + sc : ''}`,
+        };
+      }));
+      extraMeta += `<dt>Offering count</dt><dd>${oids.length}</dd>`;
+      extraMeta += `<dt>Semesters (via offerings)</dt><dd>${semSet.size ? [...semSet].join(', ') : '—'}</dd>`;
+    } else if (type === 'offering') {
+      const metaO = offeringMeta.get(id) || {};
+      if (metaO.module) {
+        relatedHtml += relatedSection('Parent Module (101)', [{
+          type: 'module',
+          id: metaO.module.Identifier,
+          label: `${metaO.module.Name} · ${metaO.module.Code || ''}`,
+        }]);
+        extraMeta += `<dt>Module code</dt><dd>${escapeHtml(metaO.module.Code || '—')}</dd>`;
+        extraMeta += `<dt>Code match?</dt><dd>${metaO.module.Code === entity.Code ? 'Offering code = Module code' : 'Offering code ≠ Module code'}</dd>`;
+      }
+      if (metaO.semester) {
+        relatedHtml += relatedSection('Semester', [{
+          type: 'semester',
+          id: metaO.semester.Identifier,
+          label: `${metaO.semester.Name} · ${metaO.semester.Code || ''}`,
+        }]);
+        const sc = metaO.semester.Code || '';
+        extraMeta += `<dt>Semester code</dt><dd>${escapeHtml(sc || '—')} ${isFourDigitSemester(sc) ? '(4-digit / term)' : '(non-4-digit / perpetual candidate)'}</dd>`;
+      }
+      if (metaO.template) {
+        extraMeta += `<dt>Course Template</dt><dd>${escapeHtml(metaO.template.Name || '')} · ${escapeHtml(metaO.template.Code || '')}</dd>`;
+      }
     } else if (type === 'semester') {
-      relatedHtml += relatedSection('Môn học (Course)', semesterCourse.forward.get(id) || [], 'course');
-    } else if (type === 'course') {
-      relatedHtml += relatedSection('Thuộc Cluster', clusterCourse.backward.get(id) || [], 'cluster');
-      relatedHtml += relatedSection('Thuộc Programme', programmeCourse.backward.get(id) || [], 'programme');
-      relatedHtml += relatedSection('Thuộc Semester', semesterCourse.backward.get(id) || [], 'semester');
+      const oids = semesterOfferingsForward.get(id) || [];
+      relatedHtml += relatedSection('Course Offerings', oids.map(oid => {
+        const o = offeringById.get(oid);
+        const m = offeringMeta.get(oid)?.module;
+        return {
+          type: 'offering',
+          id: oid,
+          label: `${o?.Name || oid}${m?.Code ? ' ← ' + m.Code : ''}`,
+        };
+      }));
+      const sc = entity.Code || '';
+      extraMeta += `<dt>4-digit?</dt><dd>${isFourDigitSemester(sc) ? 'Yes (term run code)' : 'No (perpetual candidate)'}</dd>`;
     }
 
     panel.innerHTML = `
-      <div class="detail-type-chip"><span class="dot" style="width:8px;height:8px;border-radius:50%;display:inline-block;background:${TYPE_META[type].color}"></span>${TYPE_META[type].label}</div>
+      <div class="detail-type-chip">
+        <span class="dot" style="width:8px;height:8px;background:${TYPE_META[type].color}"></span>
+        ${TYPE_META[type].label}
+      </div>
       <h3 class="detail-name">${escapeHtml(entity.Name || '')}</h3>
       <dl class="detail-meta">
         <dt>Code</dt><dd>${escapeHtml(entity.Code || '—')}</dd>
         <dt>ID</dt><dd>${escapeHtml(id)}</dd>
+        <dt>Type.Id</dt><dd>${escapeHtml(entity.Type?.Id ?? '—')}</dd>
         <dt>Path</dt><dd class="mono">${escapeHtml(entity.Path || '—')}</dd>
+        ${extraMeta}
       </dl>
       ${relatedHtml}
     `;
@@ -806,3 +954,5 @@
   }
 })();
 </script>
+</body>
+</html>
