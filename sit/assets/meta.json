@@ -1,5 +1,5 @@
 {
-  "crawledAt": "2026-07-17T07:44:45.494Z",
+  "crawledAt": "2026-07-21T03:40:40.790Z",
   "baseUrl": "https://xsitestg.singaporetech.edu.sg",
   "apiVersion": "1.55",
   "counts": {
@@ -10,7 +10,13 @@
     "courseOfferings": 2361,
     "moduleToOfferings": 1930,
     "offeringAncestors": 2361,
-    "semesterToOfferings": 39
+    "semesterToOfferings": 39,
+    "schools": 15,
+    "programs": 112,
+    "mapClusterProgramme": 110,
+    "mapClusterCourse": 2388,
+    "mapProgrammeCourse": 2860,
+    "mapSemesterCourse": 1926
   },
   "typeIds": {
     "organization": 1,
@@ -18,8 +24,12 @@
     "courseOffering": 3,
     "semester": 5,
     "module": 101,
-    "school": 103
+    "school": 103,
+    "program": 102,
+    "cluster": 103,
+    "programme": 102
   },
   "skipAncestors": false,
-  "offeringSource": "module-descendants"
+  "offeringSource": "module-descendants",
+  "clusterProgrammeCrawledAt": "2026-07-21T04:12:58.262Z"
 }

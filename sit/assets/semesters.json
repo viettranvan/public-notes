@@ -1,0 +1,431 @@
+[
+  {
+    "Identifier": "6654",
+    "Path": "/content/Semester_Ongoing/",
+    "Name": "Ongoing",
+    "Code": "Semester_Ongoing",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "6932",
+    "Path": "/content/enforced/6932-2014T1/",
+    "Name": "2014 Trimester 1",
+    "Code": "2014T1",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "7011",
+    "Path": "/content/enforced/7011-2014T2/",
+    "Name": "2014 Trimester 2",
+    "Code": "2014T2",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "7025",
+    "Path": "/content/enforced/7025-2014T3/",
+    "Name": "2014 Trimester 3",
+    "Code": "2014T3",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "8933",
+    "Path": "/content/2015T1/",
+    "Name": "2015 Trimester 1",
+    "Code": "2015T1",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "10153",
+    "Path": "/content/2015T2/",
+    "Name": "2015 Trimester 2",
+    "Code": "2015T2",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "10722",
+    "Path": "/content/2015T3/",
+    "Name": "2015 Trimester 3",
+    "Code": "2015T3",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "11346",
+    "Path": "/content/2016T1/",
+    "Name": "2016 Trimester 1",
+    "Code": "2016T1",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "11369",
+    "Path": "/content/2016T2/",
+    "Name": "2016 Trimester 2",
+    "Code": "2016T2",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "16532",
+    "Path": "/content/2016T3/",
+    "Name": "2016 Trimester 3",
+    "Code": "2016T3",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "17230",
+    "Path": null,
+    "Name": "2017 Trimester 1",
+    "Code": "2017T1",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "17258",
+    "Path": "/content/1710/",
+    "Name": "2017T1_SIS",
+    "Code": "1710",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "17272",
+    "Path": "/content/201718T2/",
+    "Name": "2017/18 Trimester 2",
+    "Code": "1720",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "17390",
+    "Path": null,
+    "Name": "2018 Trimester 1",
+    "Code": "1810",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "17396",
+    "Path": null,
+    "Name": "2017 Trimester 3",
+    "Code": "1730",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "17409",
+    "Path": "/content/1830/",
+    "Name": "2018 Trimester 3",
+    "Code": "1830",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "17420",
+    "Path": "/content/2019S1/",
+    "Name": "2019 Semester 1",
+    "Code": "2019S1",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "17483",
+    "Path": null,
+    "Name": "2019 Trimester 2",
+    "Code": "1920",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "17488",
+    "Path": null,
+    "Name": "2019 Trimester 3",
+    "Code": "1930",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "17490",
+    "Path": "/content/1910/",
+    "Name": "2019 Trimester 1",
+    "Code": "1910",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "17505",
+    "Path": null,
+    "Name": "2020/21 Trimester 1",
+    "Code": "2010",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "17565",
+    "Path": "/content/2020/",
+    "Name": "2020 Trimester 2",
+    "Code": "2020",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "17566",
+    "Path": "/content/2030/",
+    "Name": "2020 Trimester 3",
+    "Code": "2030",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "17567",
+    "Path": "/content/2110/",
+    "Name": "2021/22 Trimester 1",
+    "Code": "2110",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "17612",
+    "Path": "/content/enforced/17612-2120/",
+    "Name": "2021/22 Trimester 2",
+    "Code": "2120",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "22870",
+    "Path": "/content/enforced/22870-Ongoing/",
+    "Name": "Semester_Ongoing",
+    "Code": "Ongoing",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "23779",
+    "Path": "/content/enforced/23779-2210/",
+    "Name": "22/23 Year 1 Semester 1",
+    "Code": "2210",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "23780",
+    "Path": "/content/enforced/23780-2130/",
+    "Name": "2021/22 Trimester 3",
+    "Code": "2130",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "25198",
+    "Path": null,
+    "Name": "22/23 Year 1 Semester 2",
+    "Code": "2220",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "25203",
+    "Path": "/content/enforced/25203-2230/",
+    "Name": "2022/23 Trimester 3",
+    "Code": "2230",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "25270",
+    "Path": "/content/2310/",
+    "Name": "2023/24 Trimester 1",
+    "Code": "2310",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "25284",
+    "Path": null,
+    "Name": "HR courses",
+    "Code": "HR_course_status",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "25297",
+    "Path": "/content/enforced/25297-2024_lab_safety/",
+    "Name": "Lab Safety ",
+    "Code": "2024_lab_safety",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "25431",
+    "Path": "/content/enforced/25431-2520/",
+    "Name": "2025/26 Trimester 2",
+    "Code": "2520",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "25432",
+    "Path": "/content/enforced/25432-2510/",
+    "Name": "2025/26 Trimester 1",
+    "Code": "2510",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "25528",
+    "Path": "/content/enforced/25528-2430/",
+    "Name": "2024/25 Trimester 3",
+    "Code": "2430",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "26144",
+    "Path": "/content/enforced/26144-2530/",
+    "Name": "2025/26 Trimester 3",
+    "Code": "2530",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "27213",
+    "Path": "/content/enforced/27213-2610/",
+    "Name": "2026/27 Trimester 1",
+    "Code": "2610",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  },
+  {
+    "Identifier": "27214",
+    "Path": "/content/enforced/27214-2620/",
+    "Name": "2026/27 Trimester 2",
+    "Code": "2620",
+    "Type": {
+      "Id": 5,
+      "Code": "Semester",
+      "Name": "Semester"
+    }
+  }
+]

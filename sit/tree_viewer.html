@@ -17,6 +17,8 @@
     --hover: rgba(11,11,11,0.045);
     --mark-bg: #ffe89a;
     --mark-ink: #3a2e00;
+    --color-cluster: #2a78d6;
+    --color-programme: #008300;
     --color-module: #7c3aed;
     --color-offering: #eda100;
     --color-semester: #e87ba4;
@@ -37,6 +39,8 @@
       --hover: rgba(255,255,255,0.06);
       --mark-bg: #5a4300;
       --mark-ink: #ffe89a;
+      --color-cluster: #3987e5;
+      --color-programme: #22c55e;
       --color-module: #a78bfa;
       --color-offering: #c98500;
       --color-semester: #d55181;
@@ -66,12 +70,27 @@
     border: 1px solid #bfdbfe;
     color: #1e3a5f;
     border-radius: 10px;
-    padding: 10px 14px;
+    padding: 12px 14px;
     font-size: 13px;
     margin-bottom: 16px;
   }
+  .banner-title { font-weight: 600; margin-bottom: 6px; }
+  .banner-meta {
+    display: flex; flex-wrap: wrap; gap: 6px 14px;
+    color: inherit; opacity: 0.92; font-size: 12.5px;
+  }
+  .banner-meta strong { font-variant-numeric: tabular-nums; }
+  .glossary {
+    margin: 0 0 16px; padding: 10px 14px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; font-size: 12.5px; color: var(--ink-secondary);
+  }
+  .glossary summary { cursor: pointer; font-weight: 600; color: var(--ink-primary); }
+  .glossary ul { margin: 8px 0 0; padding-left: 1.2rem; }
+  .glossary li { margin-bottom: 4px; }
   @media (prefers-color-scheme: dark) {
     .banner { background: #0c1a2e; border-color: #1e3a5f; color: #93c5fd; }
+    .glossary { background: var(--surface); }
   }
   .stats-grid {
     display: grid;
@@ -197,6 +216,7 @@
   .badge.term { background: #fce7f3; color: #9d174d; }
   .badge.ongoing { background: #ede9fe; color: #5b21b6; }
   .badge.multi { background: #ffedd5; color: #9a3412; }
+  .group-row .name { font-style: italic; color: var(--ink-secondary); }
   mark { background: var(--mark-bg); color: var(--mark-ink); border-radius: 2px; padding: 0 1px; }
 
   .quality-groups { display: flex; flex-direction: column; gap: 18px; }
@@ -246,11 +266,21 @@
 <div class="page">
   <h1>SIT LMS Org Explorer</h1>
   <p class="subtitle">
-    Cây theo crawl Brightspace staging: <strong>Module (type 101)</strong> →
-    <strong>Course Offering (type 3)</strong>, kèm Semester.
-    Dữ liệu từ <code>raw/</code> sau khi chạy <code>crawl-orgstructure.mjs</code>.
+    Công cụ xem cấu trúc tổ chức trên <strong>LMS Staging</strong> (Brightspace):
+    Cluster → Programme → Course, và Module → Course Offering theo kỳ.
+    Dùng để align team về mapping Sync LMS / Deploy / Fork.
   </p>
-  <div class="banner" id="meta-banner">Đang tải dữ liệu crawl…</div>
+  <details class="glossary">
+    <summary>Glossary — tên trên UI ↔ loại org unit LMS</summary>
+    <ul>
+      <li><strong>Cluster</strong> ↔ LMS School</li>
+      <li><strong>Programme</strong> ↔ LMS Program</li>
+      <li><strong>Module</strong> ↔ LMS Module (định nghĩa môn, giữ qua các trimester)</li>
+      <li><strong>Course / Offering</strong> ↔ LMS Course Offering (nơi có roster / enrollment)</li>
+      <li><strong>Semester</strong> ↔ LMS Semester (mã 4 số = theo kỳ; khác 4 số = perpetual candidate)</li>
+    </ul>
+  </details>
+  <div class="banner" id="meta-banner">Đang tải dữ liệu…</div>
 
   <div class="stats-grid" id="stats-primary"></div>
   <div class="stats-grid secondary" id="stats-relations"></div>
@@ -258,7 +288,8 @@
 
   <div class="controls">
     <div class="tabs" role="tablist" id="tabs">
-      <button class="tab-btn" data-tab="module" aria-selected="true">Module ▸ Offering</button>
+      <button class="tab-btn" data-tab="cluster" aria-selected="true">Cluster ▸ Programme ▸ Course</button>
+      <button class="tab-btn" data-tab="module" aria-selected="false">Module ▸ Offering</button>
       <button class="tab-btn" data-tab="semester" aria-selected="false">Semester ▸ Offering</button>
       <button class="tab-btn" data-tab="quality" aria-selected="false">Data Quality</button>
     </div>
@@ -273,7 +304,7 @@
     </div>
   </div>
 
-  <div class="filters" id="module-filters">
+  <div class="filters" id="module-filters" style="display:none">
     <label><input type="checkbox" id="filter-has-offerings" checked /> Chỉ module có Offering</label>
     <label><input type="checkbox" id="filter-multi-only" /> Chỉ module ≥2 Offering</label>
     <label><input type="checkbox" id="filter-multi-sem" /> Module code span ≥2 semester</label>
@@ -281,7 +312,8 @@
 
   <div class="main-grid">
     <div>
-      <div class="tree-panel" data-tab="module" id="panel-module"><div class="loading">Loading…</div></div>
+      <div class="tree-panel" data-tab="cluster" id="panel-cluster"><div class="loading">Loading…</div></div>
+      <div class="tree-panel" data-tab="module" id="panel-module" hidden></div>
       <div class="tree-panel" data-tab="semester" id="panel-semester" hidden></div>
       <div class="tree-panel quality-panel" data-tab="quality" id="panel-quality" hidden></div>
     </div>
@@ -310,6 +342,7 @@
   }
 
   let modules, offerings, semesters, moduleToOfferings, offeringAncestors, semesterToOfferings, meta, report;
+  let clusters, programmes, mapClusterProgramme, mapClusterCourse, mapProgrammeCourse, mapSemesterCourse;
   try {
     [
       modules,
@@ -320,19 +353,31 @@
       semesterToOfferings,
       meta,
       report,
+      clusters,
+      programmes,
+      mapClusterProgramme,
+      mapClusterCourse,
+      mapProgrammeCourse,
+      mapSemesterCourse,
     ] = await Promise.all([
-      loadJson('raw/modules.json'),
-      loadJson('raw/course-offerings.json'),
-      loadJson('raw/semesters.json'),
-      loadJson('raw/module-to-offerings.json'),
-      loadJson('raw/offering-ancestors.json').catch(() => []),
-      loadJson('raw/semester-to-offerings.json'),
-      loadJson('raw/meta.json').catch(() => null),
+      loadJson('assets/modules.json'),
+      loadJson('assets/course-offerings.json'),
+      loadJson('assets/semesters.json'),
+      loadJson('assets/module-to-offerings.json'),
+      loadJson('assets/offering-ancestors.json').catch(() => []),
+      loadJson('assets/semester-to-offerings.json'),
+      loadJson('assets/meta.json').catch(() => null),
       loadJson('analysis/report.json').catch(() => null),
+      loadJson('assets/clusterDump.json').catch(() => loadJson('assets/schools.json')),
+      loadJson('assets/programmeDump.json').catch(() => loadJson('assets/programs.json')),
+      loadJson('assets/map_cluster_programme.json').catch(() => []),
+      loadJson('assets/map_cluster_course.json').catch(() => []),
+      loadJson('assets/map_programme_course.json').catch(() => []),
+      loadJson('assets/map_semester_course.json').catch(() => []),
     ]);
   } catch (err) {
     document.getElementById('meta-banner').outerHTML =
-      `<div class="error-box"><strong>Không tải được raw crawl.</strong><br/>${escapeHtml(err.message)}<br/><br/>Chạy: <code>node secrets/crawl/crawl-orgstructure.mjs</code> rồi mở lại file này qua local server (file:// có thể bị CORS).</div>`;
+      `<div class="error-box"><strong>Không tải được assets crawl.</strong><br/>${escapeHtml(err.message)}<br/><br/>Chạy: <code>node secrets/crawl/crawl-orgstructure.mjs</code> rồi mở lại file này qua local server (file:// có thể bị CORS).</div>`;
     return;
   }
 
@@ -359,6 +404,27 @@
   const moduleById = indexBy(modules);
   const offeringById = indexBy(offerings);
   const semesterById = indexBy(semesters);
+  const clusterById = indexBy(clusters || []);
+  const programmeById = indexBy(programmes || []);
+  // Course in Cluster tree = Course Offering
+  const courseById = offeringById;
+
+  function buildAdjacency(pairs, parentKey, childKey) {
+    const forward = new Map();
+    const backward = new Map();
+    for (const p of pairs || []) {
+      const pid = String(p[parentKey]), cid = String(p[childKey]);
+      if (!forward.has(pid)) forward.set(pid, []);
+      forward.get(pid).push(cid);
+      if (!backward.has(cid)) backward.set(cid, []);
+      backward.get(cid).push(pid);
+    }
+    return { forward, backward };
+  }
+  const clusterProgramme = buildAdjacency(mapClusterProgramme, 'clusterId', 'programmeId');
+  const clusterCourse = buildAdjacency(mapClusterCourse, 'clusterId', 'courseId');
+  const programmeCourse = buildAdjacency(mapProgrammeCourse, 'programmeId', 'courseId');
+  const semesterCourse = buildAdjacency(mapSemesterCourse, 'semesterId', 'courseId');
 
   // Enrich offerings with module/semester from ancestors
   const offeringMeta = new Map();
@@ -401,19 +467,37 @@
   );
 
   const TYPE_META = {
-    module: { label: 'Module (101)', color: 'var(--color-module)', entities: moduleById },
-    offering: { label: 'Course Offering (3)', color: 'var(--color-offering)', entities: offeringById },
-    semester: { label: 'Semester (5)', color: 'var(--color-semester)', entities: semesterById },
+    cluster: { label: 'Cluster', color: 'var(--color-cluster)', entities: clusterById },
+    programme: { label: 'Programme', color: 'var(--color-programme)', entities: programmeById },
+    course: { label: 'Course Offering', color: 'var(--color-offering)', entities: courseById },
+    module: { label: 'Module', color: 'var(--color-module)', entities: moduleById },
+    offering: { label: 'Course Offering', color: 'var(--color-offering)', entities: offeringById },
+    semester: { label: 'Semester', color: 'var(--color-semester)', entities: semesterById },
   };
 
-  const crawledAt = meta?.crawledAt || report?.generatedAt || '—';
+  const crawledAtRaw = meta?.crawledAt || report?.generatedAt || null;
+  const crawledAtLabel = (() => {
+    if (!crawledAtRaw) return '—';
+    const d = new Date(crawledAtRaw);
+    if (Number.isNaN(d.getTime())) return crawledAtRaw;
+    return d.toLocaleString('vi-VN', {
+      timeZone: 'Asia/Ho_Chi_Minh',
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    });
+  })();
   const counts = meta?.counts || report?.totals || {};
+  const n = (v) => Number(v || 0).toLocaleString('vi-VN');
   document.getElementById('meta-banner').innerHTML =
-    `Crawl: <strong>${escapeHtml(crawledAt)}</strong>`
-    + (meta?.baseUrl ? ` · ${escapeHtml(meta.baseUrl)}` : '')
-    + ` · Modules <strong>${(counts.modules ?? modules.length).toLocaleString()}</strong>`
-    + ` · Offerings <strong>${(counts.courseOfferings ?? offerings.length).toLocaleString()}</strong>`
-    + ` · Semesters <strong>${(counts.semesters ?? semesters.length).toLocaleString()}</strong>`;
+    `<div class="banner-title">LMS Staging · dữ liệu crawl mới nhất</div>`
+    + `<div class="banner-meta">`
+    + `<span>Cập nhật: <strong>${escapeHtml(crawledAtLabel)}</strong></span>`
+    + `<span>Cluster: <strong>${n(counts.schools ?? (clusters||[]).length)}</strong></span>`
+    + `<span>Programme: <strong>${n(counts.programs ?? (programmes||[]).length)}</strong></span>`
+    + `<span>Module: <strong>${n(counts.modules ?? modules.length)}</strong></span>`
+    + `<span>Course Offering: <strong>${n(counts.courseOfferings ?? offerings.length)}</strong></span>`
+    + `<span>Semester: <strong>${n(counts.semesters ?? semesters.length)}</strong></span>`
+    + `</div>`;
 
   function semesterBadge(semCode) {
     if (!semCode) return '';
@@ -496,6 +580,80 @@
     return offeringMeta.get(String(oid))?.semester?.Code
       || offeringMeta.get(String(oid))?.semester?.Name
       || '';
+  }
+
+
+  function buildClusterTree() {
+    const root = document.createElement('ul');
+    root.className = 'tree-root';
+    const sortedClusters = [...(clusters || [])].sort((a, b) => (a.Name || '').localeCompare(b.Name || ''));
+
+    for (const cluster of sortedClusters) {
+      const cid = String(cluster.Identifier);
+      const programmeIds = clusterProgramme.forward.get(cid) || [];
+      const directCourseIds = clusterCourse.forward.get(cid) || [];
+
+      const viaProgrammeCourseIds = new Set();
+      for (const pid of programmeIds) {
+        for (const courseId of (programmeCourse.forward.get(pid) || [])) viaProgrammeCourseIds.add(courseId);
+      }
+      const directOnly = directCourseIds.filter(id => !viaProgrammeCourseIds.has(id));
+      const totalCourses = new Set([...viaProgrammeCourseIds, ...directCourseIds]).size;
+      const hasChildren = programmeIds.length > 0 || directOnly.length > 0;
+
+      const li = createNodeLi('cluster', cid, {
+        hasChildren,
+        extraCountLabel: `${programmeIds.length} chương trình · ${totalCourses} môn`
+      });
+
+      if (hasChildren) {
+        const childUl = document.createElement('ul');
+        childUl.className = 'children';
+
+        for (const pid of [...programmeIds].sort(byName('programme'))) {
+          const courseIds = programmeCourse.forward.get(pid) || [];
+          const pHasChildren = courseIds.length > 0;
+          const pLi = createNodeLi('programme', pid, {
+            hasChildren: pHasChildren,
+            extraCountLabel: `${courseIds.length} môn`
+          });
+          if (pHasChildren) {
+            const cUl = document.createElement('ul');
+            cUl.className = 'children';
+            for (const courseId of [...courseIds].sort(byName('course'))) {
+              cUl.appendChild(createNodeLi('course', courseId));
+            }
+            pLi.appendChild(cUl);
+          }
+          childUl.appendChild(pLi);
+        }
+
+        if (directOnly.length > 0) {
+          const groupLi = document.createElement('li');
+          groupLi.className = 'node group leaf-group';
+          const groupRow = document.createElement('div');
+          groupRow.className = 'row group-row';
+          groupRow.innerHTML =
+            '<span class="toggle">▸</span>' +
+            '<span class="dot" style="background:var(--ink-muted)"></span>' +
+            '<span class="label"><span class="name">Gắn trực tiếp (không qua chương trình)</span></span>' +
+            `<span class="count">${directOnly.length} môn</span>`;
+          groupLi.appendChild(groupRow);
+          const gUl = document.createElement('ul');
+          gUl.className = 'children';
+          for (const courseId of [...directOnly].sort(byName('course'))) {
+            gUl.appendChild(createNodeLi('course', courseId));
+          }
+          groupLi.appendChild(gUl);
+          groupRow.addEventListener('click', () => groupLi.classList.toggle('expanded'));
+          childUl.appendChild(groupLi);
+        }
+
+        li.appendChild(childUl);
+      }
+      root.appendChild(li);
+    }
+    return root;
   }
 
   function buildModuleTree() {
@@ -719,6 +877,8 @@
     applySearch();
   }
 
+  document.getElementById('panel-cluster').innerHTML = '';
+  document.getElementById('panel-cluster').appendChild(buildClusterTree());
   document.getElementById('panel-module').innerHTML = '';
   document.getElementById('panel-module').appendChild(buildModuleTree());
   document.getElementById('panel-semester').appendChild(buildSemesterTree());
@@ -732,9 +892,11 @@
   const modulesWithOff = moduleToOfferings.filter(r => r.offeringCount > 0).length;
   const modulesMulti = moduleToOfferings.filter(r => r.offeringCount > 1).length;
   document.getElementById('stats-primary').innerHTML = [
-    { label: 'Module (101)', value: modules.length, color: 'var(--color-module)' },
-    { label: 'Course Offering (3)', value: offerings.length, color: 'var(--color-offering)' },
-    { label: 'Semester (5)', value: semesters.length, color: 'var(--color-semester)' },
+    { label: 'Cluster', value: (clusters || []).length, color: 'var(--color-cluster)' },
+    { label: 'Programme', value: (programmes || []).length, color: 'var(--color-programme)' },
+    { label: 'Module', value: modules.length, color: 'var(--color-module)' },
+    { label: 'Course Offering', value: offerings.length, color: 'var(--color-offering)' },
+    { label: 'Semester', value: semesters.length, color: 'var(--color-semester)' },
     { label: 'Module có Offering', value: modulesWithOff, color: 'var(--color-ok)' },
   ].map(t => `
     <div class="stat-tile" style="--tile-color:${t.color}">
@@ -744,6 +906,8 @@
   `).join('');
 
   document.getElementById('stats-relations').innerHTML = [
+    { label: 'Cluster → Programme', value: (mapClusterProgramme || []).length },
+    { label: 'Programme → Course', value: (mapProgrammeCourse || []).length },
     { label: 'Module ≥ 2 Offering', value: modulesMulti },
     { label: 'Module code multi-sem', value: multiSemModuleCodes.size },
     { label: 'Offering≠Module code', value: offeringAncestors.filter(r => r.module && r.offering && r.module.Code !== r.offering.Code).length },
@@ -881,7 +1045,40 @@
     let relatedHtml = '';
     let extraMeta = '';
 
-    if (type === 'module') {
+    if (type === 'cluster') {
+      relatedHtml += relatedSection('Programmes', (clusterProgramme.forward.get(id) || []).map(pid => ({
+        type: 'programme', id: pid, label: (programmeById.get(pid)?.Name || pid) + (programmeById.get(pid)?.Code ? ' · ' + programmeById.get(pid).Code : '')
+      })));
+      relatedHtml += relatedSection('Courses trực tiếp', (clusterCourse.forward.get(id) || []).map(oid => ({
+        type: 'course', id: oid, label: (courseById.get(oid)?.Name || oid)
+      })));
+      extraMeta += `<dt>LMS mapping</dt><dd>Cluster ↔ School trên LMS</dd>`;
+    } else if (type === 'programme') {
+      relatedHtml += relatedSection('Thuộc Cluster', (clusterProgramme.backward.get(id) || []).map(cid => ({
+        type: 'cluster', id: cid, label: (clusterById.get(cid)?.Name || cid)
+      })));
+      relatedHtml += relatedSection('Courses', (programmeCourse.forward.get(id) || []).map(oid => ({
+        type: 'course', id: oid, label: (courseById.get(oid)?.Name || oid)
+      })));
+      extraMeta += `<dt>LMS mapping</dt><dd>Programme ↔ Program trên LMS</dd>`;
+    } else if (type === 'course') {
+      relatedHtml += relatedSection('Thuộc Cluster', (clusterCourse.backward.get(id) || []).map(cid => ({
+        type: 'cluster', id: cid, label: (clusterById.get(cid)?.Name || cid)
+      })));
+      relatedHtml += relatedSection('Thuộc Programme', (programmeCourse.backward.get(id) || []).map(pid => ({
+        type: 'programme', id: pid, label: (programmeById.get(pid)?.Name || pid)
+      })));
+      relatedHtml += relatedSection('Thuộc Semester', (semesterCourse.backward.get(id) || []).map(sid => ({
+        type: 'semester', id: sid, label: (semesterById.get(sid)?.Name || sid)
+      })));
+      const metaO = offeringMeta.get(id);
+      if (metaO?.module) {
+        relatedHtml += relatedSection('Parent Module (101)', [{
+          type: 'module', id: metaO.module.Identifier,
+          label: `${metaO.module.Name} · ${metaO.module.Code || ''}`
+        }]);
+      }
+    } else if (type === 'module') {
       const oids = moduleOfferingsForward.get(id) || [];
       const semSet = moduleCodeSemesters.get(entity.Code || '') || new Set();
       relatedHtml += relatedSection('Course Offerings', oids.map(oid => {

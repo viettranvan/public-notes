@@ -1,0 +1,442 @@
+[
+  {
+    "clusterId": "6635",
+    "programmeId": "6636"
+  },
+  {
+    "clusterId": "7022",
+    "programmeId": "6651"
+  },
+  {
+    "clusterId": "7022",
+    "programmeId": "9463"
+  },
+  {
+    "clusterId": "7023",
+    "programmeId": "7070"
+  },
+  {
+    "clusterId": "7023",
+    "programmeId": "8985"
+  },
+  {
+    "clusterId": "7023",
+    "programmeId": "12069"
+  },
+  {
+    "clusterId": "7023",
+    "programmeId": "17791"
+  },
+  {
+    "clusterId": "7023",
+    "programmeId": "17793"
+  },
+  {
+    "clusterId": "7023",
+    "programmeId": "17794"
+  },
+  {
+    "clusterId": "7023",
+    "programmeId": "17799"
+  },
+  {
+    "clusterId": "7023",
+    "programmeId": "17801"
+  },
+  {
+    "clusterId": "7023",
+    "programmeId": "17802"
+  },
+  {
+    "clusterId": "7023",
+    "programmeId": "17812"
+  },
+  {
+    "clusterId": "7023",
+    "programmeId": "17815"
+  },
+  {
+    "clusterId": "7023",
+    "programmeId": "24726"
+  },
+  {
+    "clusterId": "7023",
+    "programmeId": "24727"
+  },
+  {
+    "clusterId": "7023",
+    "programmeId": "24728"
+  },
+  {
+    "clusterId": "7024",
+    "programmeId": "7059"
+  },
+  {
+    "clusterId": "7024",
+    "programmeId": "9566"
+  },
+  {
+    "clusterId": "7024",
+    "programmeId": "17586"
+  },
+  {
+    "clusterId": "7024",
+    "programmeId": "17787"
+  },
+  {
+    "clusterId": "7024",
+    "programmeId": "17807"
+  },
+  {
+    "clusterId": "7287",
+    "programmeId": "8042"
+  },
+  {
+    "clusterId": "7287",
+    "programmeId": "11315"
+  },
+  {
+    "clusterId": "7287",
+    "programmeId": "11434"
+  },
+  {
+    "clusterId": "8098",
+    "programmeId": "8099"
+  },
+  {
+    "clusterId": "8098",
+    "programmeId": "8100"
+  },
+  {
+    "clusterId": "8979",
+    "programmeId": "8980"
+  },
+  {
+    "clusterId": "8979",
+    "programmeId": "12059"
+  },
+  {
+    "clusterId": "8979",
+    "programmeId": "17780"
+  },
+  {
+    "clusterId": "8979",
+    "programmeId": "17781"
+  },
+  {
+    "clusterId": "8979",
+    "programmeId": "17796"
+  },
+  {
+    "clusterId": "8979",
+    "programmeId": "17800"
+  },
+  {
+    "clusterId": "11340",
+    "programmeId": "11341"
+  },
+  {
+    "clusterId": "11340",
+    "programmeId": "11342"
+  },
+  {
+    "clusterId": "11340",
+    "programmeId": "11343"
+  },
+  {
+    "clusterId": "11340",
+    "programmeId": "11344"
+  },
+  {
+    "clusterId": "11340",
+    "programmeId": "11345"
+  },
+  {
+    "clusterId": "11340",
+    "programmeId": "13974"
+  },
+  {
+    "clusterId": "11340",
+    "programmeId": "17585"
+  },
+  {
+    "clusterId": "11340",
+    "programmeId": "17778"
+  },
+  {
+    "clusterId": "11340",
+    "programmeId": "17779"
+  },
+  {
+    "clusterId": "11340",
+    "programmeId": "17792"
+  },
+  {
+    "clusterId": "11340",
+    "programmeId": "17803"
+  },
+  {
+    "clusterId": "11340",
+    "programmeId": "17804"
+  },
+  {
+    "clusterId": "11340",
+    "programmeId": "17805"
+  },
+  {
+    "clusterId": "11340",
+    "programmeId": "17808"
+  },
+  {
+    "clusterId": "11340",
+    "programmeId": "17809"
+  },
+  {
+    "clusterId": "11340",
+    "programmeId": "17810"
+  },
+  {
+    "clusterId": "11340",
+    "programmeId": "17811"
+  },
+  {
+    "clusterId": "11340",
+    "programmeId": "17814"
+  },
+  {
+    "clusterId": "11340",
+    "programmeId": "17820"
+  },
+  {
+    "clusterId": "11340",
+    "programmeId": "17829"
+  },
+  {
+    "clusterId": "11340",
+    "programmeId": "18969"
+  },
+  {
+    "clusterId": "11340",
+    "programmeId": "18971"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17394"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17777"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17782"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17783"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17784"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17785"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17786"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17788"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17789"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17790"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17795"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17797"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17798"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17806"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17813"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17816"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17819"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17821"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17822"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17823"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17824"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17825"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17826"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17827"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17828"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17830"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17831"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17832"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17833"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "17834"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "18967"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "18968"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "18970"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "25430"
+  },
+  {
+    "clusterId": "17393",
+    "programmeId": "25433"
+  },
+  {
+    "clusterId": "17416",
+    "programmeId": "17417"
+  },
+  {
+    "clusterId": "17480",
+    "programmeId": "17481"
+  },
+  {
+    "clusterId": "22544",
+    "programmeId": "17817"
+  },
+  {
+    "clusterId": "22544",
+    "programmeId": "17818"
+  },
+  {
+    "clusterId": "22869",
+    "programmeId": "22871"
+  },
+  {
+    "clusterId": "22869",
+    "programmeId": "23533"
+  },
+  {
+    "clusterId": "22869",
+    "programmeId": "25278"
+  },
+  {
+    "clusterId": "22869",
+    "programmeId": "25838"
+  },
+  {
+    "clusterId": "22869",
+    "programmeId": "26105"
+  },
+  {
+    "clusterId": "22869",
+    "programmeId": "26106"
+  },
+  {
+    "clusterId": "22869",
+    "programmeId": "27501"
+  },
+  {
+    "clusterId": "25266",
+    "programmeId": "25267"
+  },
+  {
+    "clusterId": "25266",
+    "programmeId": "26141"
+  },
+  {
+    "clusterId": "25266",
+    "programmeId": "27211"
+  },
+  {
+    "clusterId": "25266",
+    "programmeId": "27654"
+  },
+  {
+    "clusterId": "25266",
+    "programmeId": "27655"
+  },
+  {
+    "clusterId": "25266",
+    "programmeId": "27656"
+  },
+  {
+    "clusterId": "25266",
+    "programmeId": "27657"
+  },
+  {
+    "clusterId": "25266",
+    "programmeId": "27658"
+  },
+  {
+    "clusterId": "25825",
+    "programmeId": "25826"
+  }
+]
