@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SIT Course Builder — Publish content to LMS: confirmation questions</title>
+  <style>
+    :root {
+      --bg: #f6f4ef;
+      --surface: #ffffff;
+      --ink: #1c1917;
+      --muted: #57534e;
+      --line: #e7e5e4;
+      --brand: #9a3412;
+      --ok: #166534;
+      --ok-bg: #f0fdf4;
+      --warn-bg: #fff7ed;
+      --bad: #991b1b;
+      --bad-bg: #fef2f2;
+      --info: #1e3a5f;
+      --info-bg: #eff6ff;
+      --neutral-bg: #f5f5f4;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse 70% 45% at 0% 0%, #ffedd5 0%, transparent 55%),
+        var(--bg);
+      line-height: 1.55;
+    }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 2.25rem 1.25rem 3.5rem; }
+    header.hero {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 1.5rem 1.35rem;
+      margin-bottom: 1.1rem;
+    }
+    .eyebrow {
+      margin: 0 0 0.35rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--brand);
+    }
+    h1 {
+      margin: 0 0 0.55rem;
+      font-size: clamp(1.3rem, 3vw, 1.65rem);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+    .lede { margin: 0 0 0.75rem; color: var(--muted); max-width: 72ch; font-size: 0.95rem; }
+    .meta {
+      margin-top: 0.85rem;
+      display: flex; flex-wrap: wrap; gap: 0.4rem 1rem;
+      font-size: 0.82rem; color: var(--muted);
+    }
+    .summary {
+      background: var(--info-bg);
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      padding: 1rem 1.1rem;
+      margin-bottom: 1.1rem;
+      font-size: 0.92rem;
+    }
+    .summary h2 {
+      margin: 0 0 0.45rem;
+      font-size: 0.95rem;
+    }
+    .summary ul { margin: 0; padding-left: 1.15rem; color: var(--muted); }
+    .summary li { margin-bottom: 0.25rem; }
+    .glossary {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 1rem 1.1rem;
+      margin-bottom: 1.1rem;
+      font-size: 0.88rem;
+    }
+    .glossary h2 { margin: 0 0 0.45rem; font-size: 0.95rem; }
+    .glossary dl { margin: 0; }
+    .glossary dt { font-weight: 700; margin-top: 0.45rem; }
+    .glossary dd { margin: 0.15rem 0 0; color: var(--muted); }
+    nav.toc {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 0.9rem 1.1rem;
+      margin-bottom: 1.1rem;
+      font-size: 0.9rem;
+    }
+    nav.toc strong { display: block; margin-bottom: 0.4rem; }
+    nav.toc ol { margin: 0; padding-left: 1.2rem; color: var(--muted); }
+    nav.toc a { color: var(--info); text-decoration: none; }
+    nav.toc a:hover { text-decoration: underline; }
+    article.q {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 1.25rem 1.2rem;
+      margin-bottom: 1rem;
+    }
+    article.q h2 {
+      margin: 0 0 0.55rem;
+      font-size: 1.08rem;
+      letter-spacing: -0.01em;
+    }
+    article.q > p { margin: 0 0 0.75rem; font-size: 0.92rem; color: var(--muted); }
+    .ask {
+      border-radius: 10px;
+      padding: 0.75rem 0.9rem;
+      margin: 0.75rem 0 0;
+      font-size: 0.9rem;
+      background: var(--warn-bg);
+      border-left: 4px solid var(--brand);
+    }
+    .ask strong.label {
+      display: block;
+      font-size: 0.68rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 0.15rem;
+      color: var(--brand);
+    }
+    .diagram {
+      margin: 0.55rem 0;
+      padding: 0.85rem;
+      border: 1px dashed var(--line);
+      border-radius: 12px;
+      background: #fafaf9;
+    }
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: stretch;
+      gap: 0.4rem;
+    }
+    .box {
+      min-width: 7rem;
+      max-width: 11.5rem;
+      flex: 1 1 7rem;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      padding: 0.55rem 0.65rem;
+      background: #fff;
+      font-size: 0.8rem;
+    }
+    .box strong { display: block; font-size: 0.82rem; margin-bottom: 0.15rem; }
+    .box small { display: block; color: var(--muted); line-height: 1.35; }
+    .box.ok { border-color: #86efac; background: var(--ok-bg); }
+    .box.bad { border-color: #fca5a5; background: var(--bad-bg); }
+    .box.warn { border-color: #fdba74; background: var(--warn-bg); }
+    .box.info { border-color: #93c5fd; background: var(--info-bg); }
+    .box.neutral { background: var(--neutral-bg); }
+    .arrow { align-self: center; color: var(--muted); font-weight: 700; }
+    .arrow-down {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin: 0.45rem 0;
+    }
+    .split {
+      display: grid;
+      gap: 0.75rem;
+    }
+    @media (min-width: 720px) {
+      .split { grid-template-columns: 1fr 1fr; }
+    }
+    .path {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 0.75rem;
+      background: #fff;
+    }
+    .path h3 { margin: 0 0 0.5rem; font-size: 0.86rem; }
+    .path.ok { border-top: 3px solid var(--ok); }
+    .path.bad { border-top: 3px solid var(--bad); }
+    .caption {
+      margin: 0.5rem 0 0;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .tag {
+      display: inline-block;
+      font-size: 0.66rem;
+      font-weight: 700;
+      padding: 0.1rem 0.38rem;
+      border-radius: 999px;
+      vertical-align: middle;
+    }
+    .tag.ok { background: #dcfce7; color: var(--ok); }
+    .tag.bad { background: #fee2e2; color: var(--bad); }
+    .tag.ui { background: #e0e7ff; color: #3730a3; }
+    .tag.open { background: #fef3c7; color: #92400e; }
+    .hl { font-weight: 700; color: var(--info); }
+    .muted { color: var(--muted); }
+    .tree {
+      font-size: 0.84rem;
+      padding: 0.65rem 0.85rem;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      margin-bottom: 0.55rem;
+    }
+    .tree ul { margin: 0.2rem 0 0.2rem 1rem; padding: 0; }
+    .tree li { margin: 0.15rem 0; }
+    ul.compact { margin: 0; padding-left: 1.1rem; font-size: 0.82rem; color: var(--muted); }
+    ul.compact li { margin-bottom: 0.25rem; }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.84em;
+      background: var(--neutral-bg);
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <p class="eyebrow">SIT Course Builder · Publish content to LMS</p>
+      <h1>Confirmation questions — where HTML is written</h1>
+      <p class="lede">
+        Thank you for the Brightspace <strong>content write</strong> spec
+        (Course Offering <code>orgUnitId</code> + <code>Path</code> + Table of Contents)
+        and for confirming Deploy identity as <strong>Module type 101</strong>.
+        Below are the points we need confirmed so Publish content
+        uses the correct coursesite — without asking instructors for a Course ID.
+        Question 1 should only need a yes. The rest each carry at least one decision that is
+        still open — where an option is already what we have built, it says so, so you are
+        choosing whether to keep it or change it. Note that Publish is not yet released to
+        staging: “what we have built” below means what the software does, not something you
+        can see there yet.
+      </p>
+      <div class="meta">
+        <span>SIT Course Builder</span>
+        <span>20 Aug 2026</span>
+      </div>
+    </header>
+
+    <div class="summary">
+      <h2>What we already treat as settled</h2>
+      <ul>
+        <li><strong>Deploy / Save</strong> identify the subject on LMS as <strong>Module (type 101)</strong> via Module code (fallback: MC code → the matching 101).</li>
+        <li><strong>Content write</strong> cannot use that 101 as the write target. APIs need a <strong>Course Offering (type 3)</strong> with a content <code>Path</code> and ToC.</li>
+        <li>If <strong>no Course Offering matches</strong>, Deploy already fails with a message. A module in that state cannot be published at all, so Publish never has to handle “no coursesite”.</li>
+        <li>When the <strong>same module</strong> is published again, unchanged pages are not re-uploaded. The write spec keeps Brightspace module/topic IDs and a content hash, so a later Publish skips what has not changed. (Publishing one module never reads its siblings at all — see Q4.)</li>
+        <li><strong>We never delete anything on Brightspace.</strong> Publish only creates and updates objects it owns. Content it no longer recognises is left in place, never removed — recorded on the push job, but not surfaced to the instructor today. See Q5.</li>
+        <li>As built, Publish puts <strong>one folder per lesson</strong> of the Builder module on the ToC, titled after the lesson. There is no folder for the Builder module itself — see Q4.</li>
+        <li>Creating a Course Builder module does <strong>not</strong> write LMS by itself. Content appears only after an explicit Publish of that module.</li>
+        <li>Publish writes the <strong>module currently open</strong> — not every sibling under the same MC in one click, unless you tell us otherwise in Q4.</li>
+      </ul>
+    </div>
+
+    <div class="glossary">
+      <h2>Terms used below</h2>
+      <dl>
+        <dt>Module (type 101)</dt>
+        <dd>LMS module definition — parent org unit. Used for identity / Deploy lookup. No student class list and no content <code>Path</code>; Publish refuses to write to any org unit without a <code>Path</code>.</dd>
+        <dt>Coursesite / Course Offering (type 3)</dt>
+        <dd>LMS offering under a Module (and semester). Roster lives here. This is the <code>orgUnitId</code> in the content write spec.</dd>
+        <dt>Content module (ToC, Type 0)</dt>
+        <dd>A folder on the offering’s Table of Contents. Not the same thing as org unit 101.</dd>
+        <dt>Lesson (Course Builder)</dt>
+        <dd>A chapter inside a Builder module. As built, <strong>each lesson becomes one folder</strong> (content module) at the top level of the offering’s ToC, titled after the lesson.</dd>
+        <dt>Micro-credential (MC)</dt>
+        <dd>Optional Course Builder grouping. Several Builder modules may share one MC code. Deploy fallback looks up a 101 from that code.</dd>
+        <dt>Publish content</dt>
+        <dd>Write HTML / files into a coursesite ToC for the Builder module the instructor has open.</dd>
+      </dl>
+    </div>
+
+    <nav class="toc">
+      <strong>Questions</strong>
+      <ol>
+        <li><a href="#q-same-offering">Which Offering list (can be N coursesites)</a></li>
+        <li><a href="#q-zero-one-n">0 / 1 / N Offerings — where HTML goes</a></li>
+        <li><a href="#q-fallback">A Module code that gives no coursesite — fall back to the MC, or stop?</a></li>
+        <li><a href="#q-mc-toc">Several Builder modules on one coursesite — the life of that ToC</a></li>
+        <li><a href="#q-existing-content">Content already on the coursesite</a></li>
+      </ol>
+    </nav>
+
+    <!-- Q1 -->
+    <article class="q" id="q-same-offering">
+      <h2>1. Instructor enters a Module code (101) — which Offering <em>list</em> may we push to?</h2>
+      <p>
+        The field on Course Builder is a <strong>Module code</strong>. That matches an LMS
+        <strong>Module (type 101)</strong>. HTML cannot be written on the 101: it has no content
+        <code>Path</code>. Under that 101, LMS can have <strong>several Course Offerings (type 3)</strong>
+        for the same trimester. We do <strong>not</strong> ask for a Course ID. We build a
+        <strong>list</strong> of Offerings:
+      </p>
+
+      <div class="diagram">
+        <div class="flow">
+          <div class="box info">
+            <strong>1. Module code</strong>
+            <small>typed on Course Builder<br />e.g. ICT2101</small>
+          </div>
+          <span class="arrow">→</span>
+          <div class="box warn">
+            <strong>2. Find 101</strong>
+            <small>one parent org unit<br />code = ICT2101</small>
+          </div>
+          <span class="arrow">→</span>
+          <div class="box">
+            <strong>3. List children</strong>
+            <small>all Course Offerings (type 3)<br />under that 101</small>
+          </div>
+          <span class="arrow">→</span>
+          <div class="box ok">
+            <strong>4. Keep this term</strong>
+            <small>semester = Builder trimester<br />e.g. 2610 — may be 0, 1, or N</small>
+          </div>
+        </div>
+        <div class="arrow-down">result = a list of Offerings (not “the” one course). Deploy already binds this whole list for roster.</div>
+        <div class="tree">
+          <div><span class="hl">One Course Builder module</span> <span class="muted">code ICT2101 · trimester 2610</span></div>
+          <ul>
+            <li>LMS Module 101 · ICT2101 <span class="muted">— identity only, nothing is written here</span>
+              <ul>
+                <li>Offering 25801 · 2610 ← in the list</li>
+                <li>Offering 25802 · 2610 ← also in the list (same module, same term)</li>
+                <li>Offering 26105 · 2620 ← dropped (different term)</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <p class="caption">
+          Option A is only: Publish uses <strong>this list</strong> — no extra Course ID.
+          If the list has more than one Offering, that is <a href="#q-zero-one-n">question 2</a> (write all vs one).
+        </p>
+      </div>
+
+      <div class="split">
+        <div class="path ok">
+          <h3><span class="tag ok">A</span> Same lookup list as Deploy</h3>
+          <ul class="compact">
+            <li>Module code → 101 → Offerings for this trimester.</li>
+            <li>The list can be <strong>several coursesites</strong>.</li>
+            <li>Publish may only write into Offerings on that list.</li>
+            <li>How to treat N sites → Q2. Not a second lookup.</li>
+          </ul>
+        </div>
+        <div class="path bad">
+          <h3><span class="tag open">B</span> A different list</h3>
+          <ul class="compact">
+            <li>e.g. type a Course ID, or push to an Offering that Deploy did not bind.</li>
+            <li>Then we need that rule from you.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="ask">
+        <strong class="label">Please confirm</strong>
+        Option A is what we have built: the allowed Publish targets are exactly the
+        <strong>Course Offering list</strong> already found for Deploy
+        (Module code → 101 → children matching the Builder trimester), and Publish
+        refuses any other org unit. Please confirm that is right.
+        That list may contain <strong>more than one</strong> Offering; Q2 asks what to do then.
+        If you need Option B instead, how is the coursesite chosen?
+      </div>
+    </article>
+
+    <!-- Q2 -->
+    <article class="q" id="q-zero-one-n">
+      <h2>2. If one Module + trimester matches several Course Offerings — where does HTML go?</h2>
+      <p>
+        Under one 101, the same semester can have <strong>0, 1, or N</strong> Course Offerings
+        (this is the list from Q1 Option A). Deploy already binds <strong>all</strong> of them
+        and can merge roster. Content cannot be merged: each Offering has its own
+        <code>Path</code> and ToC. Publish must pick a write rule for N.
+      </p>
+
+      <div class="diagram">
+        <div class="arrow-down" style="margin-top:0">Same 101 + same trimester</div>
+        <div class="flow">
+          <div class="box bad"><strong>0</strong><small>Deploy already fails —<br />module cannot be published</small></div>
+          <div class="box ok"><strong>1</strong><small>write that ToC</small></div>
+          <div class="box warn"><strong>N</strong><small>N separate ToCs</small></div>
+        </div>
+        <p class="caption">Merging class lists does not copy HTML. Each site is a separate content store.</p>
+      </div>
+
+      <div class="diagram">
+        <div class="arrow-down" style="margin-top:0">If N — choose one rule</div>
+        <div class="split">
+          <div class="path ok">
+            <h3><span class="tag ok">A</span> Write one Offering, chosen at Publish</h3>
+            <p class="caption" style="margin:0">
+              What we have built: the Publish screen lists the bound Offerings and the person publishing
+              picks one of them. If you would rather have a fixed rule than a person choosing — a primary
+              site, or first match — tell us which.
+            </p>
+          </div>
+          <div class="path bad">
+            <h3><span class="tag open">B</span> Write every matched Offering</h3>
+            <p class="caption" style="margin:0">
+              The same HTML is upserted into each coursesite ToC (skip unchanged pages on each site).
+              <strong>Cost:</strong> pushes to one coursesite run one at a time and each site is prepared
+              separately, so this is a sequential batch across N sites rather than one action.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ask">
+        <strong class="label">Please confirm</strong>
+        <strong>0 and 1 are already built</strong> — 0 stops at Deploy with a message, 1 writes the HTML into that site.
+        Please confirm both are what you expect.<br />
+        The open case is <strong>N</strong>: Option A (one site, picked at Publish — what we have built)
+        or Option B (write every matched site)? If Option A, also tell us whether picking at Publish is
+        right, or whether you want a fixed rule instead.
+      </div>
+    </article>
+
+    <!-- Q3 -->
+    <article class="q" id="q-fallback">
+      <h2>3. A Module code that gives no coursesite — fall back to the MC code, or stop?</h2>
+      <p>
+        Course Builder has a fallback so that a module whose own LMS Module code cannot produce a
+        coursesite can still be deployed: instead of failing, it uses the 101 behind the
+        <strong>MC code</strong>. It was built to keep Deploy working; this question is whether it
+        should also be allowed to decide <em>where content is written</em>.
+      </p>
+      <p>
+        There are <strong>two ways</strong> a module ends up on the MC’s 101, triggered at different
+        moments by different conditions. They look different on screen, but they end in the
+        <strong>same place</strong>.
+      </p>
+
+      <div class="diagram">
+        <div class="arrow-down" style="margin-top:0">Path 1 — the Module code matches no 101 at all (fires on <strong>Save</strong>)</div>
+        <div class="flow">
+          <div class="box info">
+            <strong>Module code</strong>
+            <small>not found in the LMS</small>
+          </div>
+          <span class="arrow">→</span>
+          <div class="box warn">
+            <strong>MC code → its 101</strong>
+            <small>stored as this module’s<br />LMS identity, right here</small>
+          </div>
+          <span class="arrow">→</span>
+          <div class="box bad">
+            <strong>Deploy</strong>
+            <small>reads that stored 101 and binds<br /><strong>the MC’s</strong> Offerings</small>
+          </div>
+        </div>
+        <p class="caption">
+          Save does not pick a coursesite itself, but it decides <strong>which 101 Deploy will use</strong> —
+          so the coursesite is effectively settled here. The module also takes its title from the matched
+          101, which on this path means it is <strong>renamed after the MC</strong>.
+        </p>
+      </div>
+
+      <div class="diagram">
+        <div class="arrow-down" style="margin-top:0">Path 2 — the 101 exists but has no Offering this term (fires on <strong>Deploy</strong>)</div>
+        <div class="flow">
+          <div class="box info">
+            <strong>Module code</strong>
+            <small>e.g. ICT2102 — found,<br />and confirmed at Save</small>
+          </div>
+          <span class="arrow">→</span>
+          <div class="box bad">
+            <strong>0 Offerings for 2610</strong>
+            <small>nothing to bind</small>
+          </div>
+          <span class="arrow">→</span>
+          <div class="box warn">
+            <strong>MC code → its 101</strong>
+            <small>bind <strong>its</strong> Offerings instead</small>
+          </div>
+        </div>
+        <p class="caption">
+          A Module code can pass the Save check and still be overridden at Deploy: Save asks
+          “does this subject exist?”, Deploy asks “does it have a coursesite this term?”.
+        </p>
+      </div>
+
+      <div class="diagram">
+        <div class="arrow-down" style="margin-top:0">Both paths end here</div>
+        <div class="tree">
+          <div><span class="hl">Example</span> <span class="muted">MC-ABC groups three Builder modules, all for trimester 2610</span></div>
+          <ul>
+            <li><strong>Module A</strong> · code ICT2100 → its 101 has Offering 25958 · 2610
+              → <span class="muted">publishes to its own coursesite</span></li>
+            <li><strong>Module B</strong> · code ICT2102 → 101 exists, no 2610 Offering
+              → <strong>Path 2</strong> → <span class="muted">publishes to the MC-ABC coursesite</span></li>
+            <li><strong>Module C</strong> · code not in the LMS at all
+              → <strong>Path 1</strong> → <span class="muted">publishes to the <strong>same</strong> MC-ABC coursesite as B</span></li>
+          </ul>
+        </div>
+        <p class="caption">
+          B and C now share one ToC — the layout problem in <a href="#q-mc-toc">question 4</a> — while A does not.
+          Nobody chose that split. It follows from which 101 happens to resolve, and from which 101 happens to
+          have an Offering this term — and the second of those can change from one trimester to the next.
+        </p>
+      </div>
+
+      <p>
+        Deploy succeeds on both paths, with no warning. The Publish screen does list the coursesite by name and
+        id, so an attentive instructor could notice it belongs to the MC rather than to their module — but
+        nothing on screen tells them a fallback happened.
+      </p>
+
+      <div class="split">
+        <div class="path ok">
+          <h3><span class="tag ok">A</span> Keep it silent</h3>
+          <ul class="compact">
+            <li>Current behaviour, on both paths.</li>
+            <li>Deploy succeeds as often as possible.</li>
+            <li>Publish may land on a coursesite shared with sibling modules, so question 4 applies to every module that falls back.</li>
+          </ul>
+        </div>
+        <div class="path bad">
+          <h3><span class="tag open">B</span> Stop with an error</h3>
+          <ul class="compact">
+            <li>“No coursesite found for this Module code.”</li>
+            <li>Nothing is ever published to a shared site by accident.</li>
+            <li><strong>Cost:</strong> the module cannot be deployed until staff fix the code or create the
+              Offering in the LMS — and for trimester-based modules Deploy only opens in the two weeks
+              before the trimester starts.</li>
+            <li>Please check how many modules rely on the fallback today; Option B stops all of them.</li>
+          </ul>
+        </div>
+        <div class="path">
+          <h3><span class="tag open">C</span> Keep it, but ask first</h3>
+          <ul class="compact">
+            <li>The operator is told which coursesite is about to be used, and confirms it — on whichever
+              path triggered the fallback.</li>
+            <li>e.g. “No coursesite found for ICT2102. Use the MC-ABC coursesite instead?”</li>
+            <li>Same reach as Option A, without the silence.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="ask">
+        <strong class="label">Please confirm</strong>
+        When a Module code gives no coursesite of its own, should Course Builder fall back to the MC
+        silently (A), refuse (B), or fall back only after the operator confirms the named coursesite (C)?<br />
+        Please answer for <strong>both paths</strong> — or tell us if they should behave differently
+        (for example: allow Path 1, where the code was never valid, but refuse Path 2, where the module has
+        a real 101 that is simply missing an Offering this term).<br />
+        If you pick A or C, question 4 applies to every module that lands on a shared MC coursesite.
+      </div>
+    </article>
+
+    <!-- Q4 -->
+    <article class="q" id="q-mc-toc">
+      <h2>4. Several Course Builder modules share one coursesite — the life of that ToC</h2>
+      <p>
+        One Micro-credential can group 3–4 Course Builder modules, and through the fallback in
+        <a href="#q-fallback">question 3</a> they can resolve to the <strong>same Offering</strong> —
+        modules <strong>B</strong> and <strong>C</strong> in that example.
+        Everything below follows from that one situation: how the shared Table of Contents is laid out
+        to begin with, what happens when a further module is added later, and who decides the order.
+      </p>
+
+      <div class="diagram">
+        <div class="arrow-down" style="margin-top:0">Part 1 — how Publish lays out the ToC</div>
+        <div class="tree">
+          <div><span class="hl">One Offering</span> <span class="muted">· one Path · one ToC</span></div>
+          <ul>
+            <li>Lesson 1 of module B <span class="muted">← folder, titled after the lesson</span></li>
+            <li>Lesson 2 of module B</li>
+            <li>Lesson 1 of module C <span class="muted">← same level, nothing separates them</span></li>
+            <li>Lesson 2 of module C</li>
+          </ul>
+        </div>
+        <p class="caption">
+          Publish creates <strong>one folder per lesson</strong> at the top level of the ToC.
+          There is <strong>no folder for the Builder module itself</strong>, so two modules published
+          into one coursesite interleave and cannot be told apart by a learner.
+        </p>
+      </div>
+
+      <div class="split">
+        <div class="path ok">
+          <h3><span class="tag ok">A</span> One Builder module = one coursesite</h3>
+          <div class="flow">
+            <div class="box"><strong>Module B</strong><small>own Module code 101<br />own Offering ToC</small></div>
+            <div class="box"><strong>Module C</strong><small>own Module code 101<br />own Offering ToC</small></div>
+          </div>
+          <p class="caption">
+            Works with what we have built, no change needed. A module’s lessons are the only thing on
+            that ToC, so the flat
+            folder-per-lesson layout reads correctly, and parts 2 and 3 below stop being a problem.
+            <strong>Requires</strong> that every Builder module has a Module code resolving to a 101 that
+            has an Offering — i.e. Option B in question 3.
+          </p>
+        </div>
+        <div class="path bad">
+          <h3><span class="tag open">B</span> Several Builder modules = one coursesite</h3>
+          <div class="flow">
+            <div class="box warn"><strong>One Offering</strong><small>one Path · one ToC</small></div>
+            <span class="arrow">→</span>
+            <div class="box"><strong>Folder “Module B”</strong><small>lessons nested inside</small></div>
+            <div class="box"><strong>Folder “Module C”</strong><small>lessons nested inside</small></div>
+          </div>
+          <p class="caption">
+            To keep the modules apart we would add a <strong>new folder level</strong> — one folder per
+            Builder module, lessons nested one level deeper. That is a change to how Publish builds the
+            ToC, not a setting, so we need to know before we build it.
+          </p>
+        </div>
+      </div>
+
+      <div class="diagram">
+        <div class="arrow-down">Part 2 — a further module is added later</div>
+        <div class="flow">
+          <div class="box ok">
+            <strong>B and C published</strong>
+            <small>on the shared coursesite</small>
+          </div>
+          <span class="arrow">→</span>
+          <div class="box info">
+            <strong>Create D</strong>
+            <small>Course Builder only<br />LMS unchanged</small>
+          </div>
+          <span class="arrow">→</span>
+          <div class="box warn">
+            <strong>Publish D</strong>
+            <small>D’s lesson folders are added<br />to the same ToC</small>
+          </div>
+        </div>
+        <p class="caption">
+          Creating D writes nothing to the LMS — content appears only when someone opens D and presses
+          Publish. And publishing D <strong>does not touch B or C at all</strong>: a push job is scoped to
+          one Builder module, so its siblings are never even read. This is not “they get skipped because
+          nothing changed” — they are outside the job.
+        </p>
+      </div>
+
+      <div class="diagram">
+        <div class="arrow-down">Part 3 — who controls the order</div>
+        <p class="caption" style="margin-top:0">
+          Two things Publish does with the ToC order, and one it deliberately does not:
+        </p>
+        <div class="flow">
+          <div class="box ok">
+            <strong>Orders its own folders</strong>
+            <small>the lessons of the module being published are put into that module’s order</small>
+          </div>
+          <div class="box ok">
+            <strong>Never moves anyone else’s</strong>
+            <small>by design, it never repositions a folder it does not own</small>
+          </div>
+          <div class="box bad">
+            <strong>Does not choose where a new folder lands</strong>
+            <small>on creation Publish sends no position at all — the placement is Brightspace’s</small>
+          </div>
+        </div>
+        <p class="caption">
+          One further limit is worth stating plainly: the reorder pass only issues a move when one of its own
+          folders sits <strong>earlier</strong> than the folder it is supposed to follow. It never issues a move
+          merely to close a gap — so another module’s content sitting in between stays in between.
+        </p>
+        <div class="tree">
+          <div><span class="hl">A state this permits</span> <span class="muted">on a shared ToC</span></div>
+          <ul>
+            <li>Lesson 1 of B</li>
+            <li>Lesson 2 of B</li>
+            <li>Lesson 1 of C</li>
+            <li>Lesson 2 of C</li>
+            <li>Lesson 1 of D</li>
+            <li>Lesson 2 of D</li>
+            <li><strong>Lesson 3 of B</strong> <span class="muted">← added later, and separated from the rest of B</span></li>
+          </ul>
+        </div>
+        <p class="caption">
+          B’s lessons are in the correct order — 1, then 2, then 3. They are simply not together, and Publish
+          will not correct that: nothing is out of order, there is only a gap. On a coursesite holding a single
+          module this never shows, because there is nothing to sit in the gap.
+        </p>
+      </div>
+
+      <div class="ask">
+        <strong class="label">Please confirm</strong>
+        <strong>(1) Layout.</strong> For Builder modules that share an MC: Option A (each module has its own
+        Module code 101 and its own Offering ToC) or Option B (they share one Offering, with a new
+        module-level folder)? If Option B, what should that folder be titled — Builder module title, Module
+        code, or both — and is pushing the lessons one level deeper acceptable to your instructors?<br />
+        <strong>(2) Adding a module later.</strong> Please confirm a new module reaches the LMS only after
+        <strong>Publish on that module</strong>, and that its siblings are never rewritten. If you also want
+        an MC-level “publish everything not yet published”, tell us — note that pushes to one coursesite run
+        one at a time, so it would be a sequential batch rather than a single action.<br />
+        <strong>(3) Order.</strong> If several modules do share one ToC, does their order matter to you?
+        If it does, where should that order come from — the MC’s module list, staff arranging it in
+        Brightspace, or something else? Today nothing in Course Builder expresses “module B comes before
+        module C”.
+      </div>
+    </article>
+
+    <!-- Q5 -->
+    <article class="q" id="q-existing-content">
+      <h2>5. The coursesite already has content — adopt it, or always create our own?</h2>
+      <p>
+        A coursesite may already carry content: made by staff, left by an earlier system, or brought in
+        by a Brightspace course copy. Before writing anything, Publish reads the ToC and sorts every
+        top-level folder into three groups.
+      </p>
+
+      <div class="diagram">
+        <div class="flow">
+          <div class="box ok">
+            <strong>Ours</strong>
+            <small>we created it on an<br />earlier Publish → update in place</small>
+          </div>
+          <div class="box warn">
+            <strong>Same title as a lesson<br />we are about to publish</strong>
+            <small>offered to the instructor:<br />“adopt instead of duplicating?”</small>
+          </div>
+          <div class="box">
+            <strong>Everything else</strong>
+            <small>left untouched, listed as<br />“not managed by Course Builder”</small>
+          </div>
+        </div>
+        <p class="caption">
+          Nothing is adopted silently — the instructor ticks each one. Adopting marks the folder as ours
+          from then on, so later Publishes keep updating it instead of creating a second copy.
+        </p>
+      </div>
+
+      <div class="split">
+        <div class="path ok">
+          <h3><span class="tag ok">A</span> Keep adopt-by-title</h3>
+          <ul class="compact">
+            <li>What we have built.</li>
+            <li>Avoids duplicate folders when the site already mirrors the module.</li>
+            <li>Useful right after a Brightspace course copy.</li>
+          </ul>
+        </div>
+        <div class="path bad">
+          <h3><span class="tag open">B</span> Always create our own</h3>
+          <ul class="compact">
+            <li>Publish never touches a folder it did not create.</li>
+            <li>Simplest ownership story.</li>
+            <li>Duplicate folders appear wherever titles already match.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="ask">
+        <strong class="label">Please confirm</strong>
+        (1) Should Publish keep offering <strong>adopt-by-title</strong> (Option A), or always create its own
+        folders (Option B)?<br />
+        (2) Please confirm the delete policy: <strong>we never remove anything on Brightspace</strong>.
+        When a lesson is deleted in Course Builder, its folder stays on the coursesite with its content and
+        learners keep seeing it. The leftover is recorded on the push job, but we do not show it to the
+        instructor today. Is leaving it what you want — and should we surface these leftovers on screen so
+        staff know what to clean up?
+      </div>
+    </article>
+
+  </div>
+</body>
+</html>
