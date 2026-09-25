@@ -1,5 +1,5 @@
 {
-  "crawledAt": "2026-07-21T03:40:40.790Z",
+  "crawledAt": "2026-09-25T10:17:21.426Z",
   "baseUrl": "https://xsitestg.singaporetech.edu.sg",
   "apiVersion": "1.55",
   "counts": {
@@ -7,16 +7,16 @@
     "semesters": 39,
     "modules": 1930,
     "courseTemplates": 1579,
-    "courseOfferings": 2361,
+    "courseOfferings": 2431,
     "moduleToOfferings": 1930,
     "offeringAncestors": 2361,
     "semesterToOfferings": 39,
     "schools": 15,
-    "programs": 112,
-    "mapClusterProgramme": 110,
-    "mapClusterCourse": 2388,
-    "mapProgrammeCourse": 2860,
-    "mapSemesterCourse": 1926
+    "programs": 114,
+    "mapClusterProgramme": 112,
+    "mapClusterCourse": 2444,
+    "mapProgrammeCourse": 2878,
+    "mapSemesterCourse": 1967
   },
   "typeIds": {
     "organization": 1,
@@ -31,5 +31,9 @@
   },
   "skipAncestors": false,
   "offeringSource": "module-descendants",
-  "clusterProgrammeCrawledAt": "2026-07-21T04:12:58.262Z"
+  "clusterProgrammeCrawledAt": "2026-09-25T10:17:21.426Z",
+  "devTreeSync": {
+    "script": "/Users/ryuk/Desktop/NodeJs/my-app/SIT_CRAWL/crawl.js",
+    "outputDir": "/Users/ryuk/Desktop/NodeJs/my-app/SIT_CRAWL/output"
+  }
 }

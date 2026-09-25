@@ -11017,11 +11017,11 @@
   },
   {
     "programmeId": "25267",
-    "courseId": "26261"
+    "courseId": "27567"
   },
   {
     "programmeId": "25267",
-    "courseId": "27567"
+    "courseId": "27997"
   },
   {
     "programmeId": "25278",
@@ -11325,6 +11325,10 @@
   },
   {
     "programmeId": "27654",
+    "courseId": "26261"
+  },
+  {
+    "programmeId": "27654",
     "courseId": "26262"
   },
   {
@@ -11358,6 +11362,62 @@
   {
     "programmeId": "27654",
     "courseId": "27815"
+  },
+  {
+    "programmeId": "27654",
+    "courseId": "27965"
+  },
+  {
+    "programmeId": "27654",
+    "courseId": "27966"
+  },
+  {
+    "programmeId": "27654",
+    "courseId": "27967"
+  },
+  {
+    "programmeId": "27654",
+    "courseId": "27968"
+  },
+  {
+    "programmeId": "27654",
+    "courseId": "27969"
+  },
+  {
+    "programmeId": "27654",
+    "courseId": "27970"
+  },
+  {
+    "programmeId": "27654",
+    "courseId": "27971"
+  },
+  {
+    "programmeId": "27654",
+    "courseId": "27972"
+  },
+  {
+    "programmeId": "27654",
+    "courseId": "27973"
+  },
+  {
+    "programmeId": "27654",
+    "courseId": "27974"
+  },
+  {
+    "programmeId": "27654",
+    "courseId": "27975"
+  },
+  {
+    "programmeId": "27654",
+    "courseId": "27976"
+  },
+  {
+    "programmeId": "27654",
+    "courseId": "27978"
+  },
+  {
+    "programmeId": "27654",
+    "courseId": "27979"
   },
   {
     "programmeId": "27655",
@@ -11408,6 +11468,14 @@
     "courseId": "27828"
   },
   {
+    "programmeId": "27655",
+    "courseId": "27977"
+  },
+  {
+    "programmeId": "27655",
+    "courseId": "27980"
+  },
+  {
     "programmeId": "27656",
     "courseId": "26145"
   },
@@ -11438,5 +11506,9 @@
   {
     "programmeId": "27657",
     "courseId": "27812"
+  },
+  {
+    "programmeId": "27925",
+    "courseId": "27928"
   }
 ]

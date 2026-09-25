@@ -330,9 +330,16 @@
 <script>
 (async function () {
   const FOUR_DIGIT = /^\d{4}$/;
-
+  /** Mọi JSON viewer đọc từ thư mục này (cùng cấp tree_viewer.html → sit/assets/). */
+  const ASSETS_BASE = 'assets';
   function isFourDigitSemester(code) {
     return FOUR_DIGIT.test(String(code || '').trim());
+  }
+
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => (
+      { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+    ));
   }
 
   async function loadJson(url) {
@@ -341,10 +348,8 @@
     return res.json();
   }
 
-  let modules, offerings, semesters, moduleToOfferings, offeringAncestors, semesterToOfferings, meta, report;
-  let clusters, programmes, mapClusterProgramme, mapClusterCourse, mapProgrammeCourse, mapSemesterCourse;
-  try {
-    [
+  async function loadAllAssets() {
+    const [
       modules,
       offerings,
       semesters,
@@ -360,32 +365,70 @@
       mapProgrammeCourse,
       mapSemesterCourse,
     ] = await Promise.all([
-      loadJson('assets/modules.json'),
-      loadJson('assets/course-offerings.json'),
-      loadJson('assets/semesters.json'),
-      loadJson('assets/module-to-offerings.json'),
-      loadJson('assets/offering-ancestors.json').catch(() => []),
-      loadJson('assets/semester-to-offerings.json'),
-      loadJson('assets/meta.json').catch(() => null),
+      loadJson(`${ASSETS_BASE}/modules.json`),
+      loadJson(`${ASSETS_BASE}/course-offerings.json`),
+      loadJson(`${ASSETS_BASE}/semesters.json`),
+      loadJson(`${ASSETS_BASE}/module-to-offerings.json`),
+      loadJson(`${ASSETS_BASE}/offering-ancestors.json`).catch(() => []),
+      loadJson(`${ASSETS_BASE}/semester-to-offerings.json`),
+      loadJson(`${ASSETS_BASE}/meta.json`).catch(() => null),
       loadJson('analysis/report.json').catch(() => null),
-      loadJson('assets/clusterDump.json').catch(() => loadJson('assets/schools.json')),
-      loadJson('assets/programmeDump.json').catch(() => loadJson('assets/programs.json')),
-      loadJson('assets/map_cluster_programme.json').catch(() => []),
-      loadJson('assets/map_cluster_course.json').catch(() => []),
-      loadJson('assets/map_programme_course.json').catch(() => []),
-      loadJson('assets/map_semester_course.json').catch(() => []),
+      loadJson(`${ASSETS_BASE}/clusterDump.json`).catch(() => loadJson(`${ASSETS_BASE}/schools.json`)),
+      loadJson(`${ASSETS_BASE}/programmeDump.json`).catch(() => loadJson(`${ASSETS_BASE}/programs.json`)),
+      loadJson(`${ASSETS_BASE}/map_cluster_programme.json`).catch(() => []),
+      loadJson(`${ASSETS_BASE}/map_cluster_course.json`).catch(() => []),
+      loadJson(`${ASSETS_BASE}/map_programme_course.json`).catch(() => []),
+      loadJson(`${ASSETS_BASE}/map_semester_course.json`).catch(() => []),
     ]);
+    return {
+      modules,
+      offerings,
+      semesters,
+      moduleToOfferings,
+      offeringAncestors,
+      semesterToOfferings,
+      meta,
+      report,
+      clusters,
+      programmes,
+      mapClusterProgramme,
+      mapClusterCourse,
+      mapProgrammeCourse,
+      mapSemesterCourse,
+    };
+  }
+
+  let modules, offerings, semesters, moduleToOfferings, offeringAncestors, semesterToOfferings, meta, report;
+  let clusters, programmes, mapClusterProgramme, mapClusterCourse, mapProgrammeCourse, mapSemesterCourse;
+  let moduleById, offeringById, semesterById, clusterById, programmeById, courseById;
+  let clusterProgramme, clusterCourse, programmeCourse, semesterCourse;
+  let offeringMeta, moduleOfferingsForward, semesterOfferingsForward;
+  let moduleCodeSemesters, multiSemModuleCodes;
+  let TYPE_META;
+
+  try {
+    ({
+      modules,
+      offerings,
+      semesters,
+      moduleToOfferings,
+      offeringAncestors,
+      semesterToOfferings,
+      meta,
+      report,
+      clusters,
+      programmes,
+      mapClusterProgramme,
+      mapClusterCourse,
+      mapProgrammeCourse,
+      mapSemesterCourse,
+    } = await loadAllAssets());
   } catch (err) {
     document.getElementById('meta-banner').outerHTML =
-      `<div class="error-box"><strong>Không tải được assets crawl.</strong><br/>${escapeHtml(err.message)}<br/><br/>Chạy: <code>node secrets/crawl/crawl-orgstructure.mjs</code> rồi mở lại file này qua local server (file:// có thể bị CORS).</div>`;
+      `<div class="error-box"><strong>Không tải được assets.</strong><br/>${escapeHtml(err.message)}<br/><br/>Chạy crawl trên máy local, copy JSON vào <code>sit/assets/</code>, rồi mở lại trang qua HTTP server (không dùng file://).</div>`;
     return;
   }
 
-  function escapeHtml(s) {
-    return String(s ?? '').replace(/[&<>"']/g, c => (
-      { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
-    ));
-  }
   function highlight(text, query) {
     const raw = String(text || '');
     if (!query) return escapeHtml(raw);
@@ -401,14 +444,6 @@
     return m;
   }
 
-  const moduleById = indexBy(modules);
-  const offeringById = indexBy(offerings);
-  const semesterById = indexBy(semesters);
-  const clusterById = indexBy(clusters || []);
-  const programmeById = indexBy(programmes || []);
-  // Course in Cluster tree = Course Offering
-  const courseById = offeringById;
-
   function buildAdjacency(pairs, parentKey, childKey) {
     const forward = new Map();
     const backward = new Map();
@@ -421,62 +456,74 @@
     }
     return { forward, backward };
   }
-  const clusterProgramme = buildAdjacency(mapClusterProgramme, 'clusterId', 'programmeId');
-  const clusterCourse = buildAdjacency(mapClusterCourse, 'clusterId', 'courseId');
-  const programmeCourse = buildAdjacency(mapProgrammeCourse, 'programmeId', 'courseId');
-  const semesterCourse = buildAdjacency(mapSemesterCourse, 'semesterId', 'courseId');
 
-  // Enrich offerings with module/semester from ancestors
-  const offeringMeta = new Map();
-  for (const row of offeringAncestors) {
-    const oid = String(row.offering?.Identifier);
-    offeringMeta.set(oid, {
-      module: row.module,
-      semester: row.semester,
-      template: row.template,
-    });
-  }
+  function rebuildDerivedState() {
+    moduleById = indexBy(modules);
+    offeringById = indexBy(offerings);
+    semesterById = indexBy(semesters);
+    clusterById = indexBy(clusters || []);
+    programmeById = indexBy(programmes || []);
+    courseById = offeringById;
 
-  const moduleOfferingsForward = new Map();
-  for (const row of moduleToOfferings) {
-    moduleOfferingsForward.set(
-      String(row.module.Identifier),
-      (row.offerings || []).map(o => String(o.Identifier)),
+    clusterProgramme = buildAdjacency(mapClusterProgramme, 'clusterId', 'programmeId');
+    clusterCourse = buildAdjacency(mapClusterCourse, 'clusterId', 'courseId');
+    programmeCourse = buildAdjacency(mapProgrammeCourse, 'programmeId', 'courseId');
+    semesterCourse = buildAdjacency(mapSemesterCourse, 'semesterId', 'courseId');
+
+    offeringMeta = new Map();
+    for (const row of offeringAncestors) {
+      const oid = String(row.offering?.Identifier);
+      offeringMeta.set(oid, {
+        module: row.module,
+        semester: row.semester,
+        template: row.template,
+      });
+    }
+
+    moduleOfferingsForward = new Map();
+    for (const row of moduleToOfferings) {
+      moduleOfferingsForward.set(
+        String(row.module.Identifier),
+        (row.offerings || []).map(o => String(o.Identifier)),
+      );
+    }
+
+    semesterOfferingsForward = new Map();
+    for (const row of semesterToOfferings) {
+      semesterOfferingsForward.set(
+        String(row.semester.Identifier),
+        (row.offerings || []).map(o => String(o.Identifier)),
+      );
+    }
+
+    moduleCodeSemesters = new Map();
+    for (const row of offeringAncestors) {
+      const mCode = row.module?.Code || '';
+      if (!mCode) continue;
+      if (!moduleCodeSemesters.has(mCode)) moduleCodeSemesters.set(mCode, new Set());
+      const sc = row.semester?.Code || row.semester?.Name;
+      if (sc) moduleCodeSemesters.get(mCode).add(sc);
+    }
+    multiSemModuleCodes = new Set(
+      [...moduleCodeSemesters.entries()].filter(([, s]) => s.size > 1).map(([c]) => c),
     );
+
+    TYPE_META = {
+      cluster: { label: 'Cluster', color: 'var(--color-cluster)', entities: clusterById },
+      programme: { label: 'Programme', color: 'var(--color-programme)', entities: programmeById },
+      course: { label: 'Course Offering', color: 'var(--color-offering)', entities: courseById },
+      module: { label: 'Module', color: 'var(--color-module)', entities: moduleById },
+      offering: { label: 'Course Offering', color: 'var(--color-offering)', entities: offeringById },
+      semester: { label: 'Semester', color: 'var(--color-semester)', entities: semesterById },
+    };
   }
 
-  const semesterOfferingsForward = new Map();
-  for (const row of semesterToOfferings) {
-    semesterOfferingsForward.set(
-      String(row.semester.Identifier),
-      (row.offerings || []).map(o => String(o.Identifier)),
-    );
-  }
+  rebuildDerivedState();
 
-  // Module code → distinct semester codes (from ancestors)
-  const moduleCodeSemesters = new Map();
-  for (const row of offeringAncestors) {
-    const mCode = row.module?.Code || '';
-    if (!mCode) continue;
-    if (!moduleCodeSemesters.has(mCode)) moduleCodeSemesters.set(mCode, new Set());
-    const sc = row.semester?.Code || row.semester?.Name;
-    if (sc) moduleCodeSemesters.get(mCode).add(sc);
-  }
-  const multiSemModuleCodes = new Set(
-    [...moduleCodeSemesters.entries()].filter(([, s]) => s.size > 1).map(([c]) => c),
-  );
+  const n = (v) => Number(v || 0).toLocaleString('vi-VN');
 
-  const TYPE_META = {
-    cluster: { label: 'Cluster', color: 'var(--color-cluster)', entities: clusterById },
-    programme: { label: 'Programme', color: 'var(--color-programme)', entities: programmeById },
-    course: { label: 'Course Offering', color: 'var(--color-offering)', entities: courseById },
-    module: { label: 'Module', color: 'var(--color-module)', entities: moduleById },
-    offering: { label: 'Course Offering', color: 'var(--color-offering)', entities: offeringById },
-    semester: { label: 'Semester', color: 'var(--color-semester)', entities: semesterById },
-  };
-
-  const crawledAtRaw = meta?.crawledAt || report?.generatedAt || null;
-  const crawledAtLabel = (() => {
+  function formatCrawledAtLabel() {
+    const crawledAtRaw = meta?.crawledAt || report?.generatedAt || null;
     if (!crawledAtRaw) return '—';
     const d = new Date(crawledAtRaw);
     if (Number.isNaN(d.getTime())) return crawledAtRaw;
@@ -485,19 +532,21 @@
       dateStyle: 'medium',
       timeStyle: 'short',
     });
+  }
+
+  (function renderMetaBanner() {
+    const counts = meta?.counts || report?.totals || {};
+    document.getElementById('meta-banner').innerHTML =
+      `<div class="banner-title">LMS Staging · dữ liệu từ <code>sit/${ASSETS_BASE}/</code></div>`
+      + `<div class="banner-meta">`
+      + `<span>Cập nhật: <strong>${escapeHtml(formatCrawledAtLabel())}</strong></span>`
+      + `<span>Cluster: <strong>${n(counts.schools ?? (clusters||[]).length)}</strong></span>`
+      + `<span>Programme: <strong>${n(counts.programs ?? (programmes||[]).length)}</strong></span>`
+      + `<span>Module: <strong>${n(counts.modules ?? modules.length)}</strong></span>`
+      + `<span>Course Offering: <strong>${n(counts.courseOfferings ?? offerings.length)}</strong></span>`
+      + `<span>Semester: <strong>${n(counts.semesters ?? semesters.length)}</strong></span>`
+      + `</div>`;
   })();
-  const counts = meta?.counts || report?.totals || {};
-  const n = (v) => Number(v || 0).toLocaleString('vi-VN');
-  document.getElementById('meta-banner').innerHTML =
-    `<div class="banner-title">LMS Staging · dữ liệu crawl mới nhất</div>`
-    + `<div class="banner-meta">`
-    + `<span>Cập nhật: <strong>${escapeHtml(crawledAtLabel)}</strong></span>`
-    + `<span>Cluster: <strong>${n(counts.schools ?? (clusters||[]).length)}</strong></span>`
-    + `<span>Programme: <strong>${n(counts.programs ?? (programmes||[]).length)}</strong></span>`
-    + `<span>Module: <strong>${n(counts.modules ?? modules.length)}</strong></span>`
-    + `<span>Course Offering: <strong>${n(counts.courseOfferings ?? offerings.length)}</strong></span>`
-    + `<span>Semester: <strong>${n(counts.semesters ?? semesters.length)}</strong></span>`
-    + `</div>`;
 
   function semesterBadge(semCode) {
     if (!semCode) return '';
@@ -877,54 +926,63 @@
     applySearch();
   }
 
-  document.getElementById('panel-cluster').innerHTML = '';
-  document.getElementById('panel-cluster').appendChild(buildClusterTree());
-  document.getElementById('panel-module').innerHTML = '';
-  document.getElementById('panel-module').appendChild(buildModuleTree());
-  document.getElementById('panel-semester').appendChild(buildSemesterTree());
-  document.getElementById('panel-quality').appendChild(buildQualityView());
-
-  ['filter-has-offerings', 'filter-multi-only', 'filter-multi-sem'].forEach(id => {
-    document.getElementById(id).addEventListener('change', rebuildModulePanel);
-  });
-
-  // Stats
-  const modulesWithOff = moduleToOfferings.filter(r => r.offeringCount > 0).length;
-  const modulesMulti = moduleToOfferings.filter(r => r.offeringCount > 1).length;
-  document.getElementById('stats-primary').innerHTML = [
-    { label: 'Cluster', value: (clusters || []).length, color: 'var(--color-cluster)' },
-    { label: 'Programme', value: (programmes || []).length, color: 'var(--color-programme)' },
-    { label: 'Module', value: modules.length, color: 'var(--color-module)' },
-    { label: 'Course Offering', value: offerings.length, color: 'var(--color-offering)' },
-    { label: 'Semester', value: semesters.length, color: 'var(--color-semester)' },
-    { label: 'Module có Offering', value: modulesWithOff, color: 'var(--color-ok)' },
-  ].map(t => `
+  function refreshStatsAndLegend() {
+    const modulesWithOff = moduleToOfferings.filter(r => r.offeringCount > 0).length;
+    const modulesMulti = moduleToOfferings.filter(r => r.offeringCount > 1).length;
+    document.getElementById('stats-primary').innerHTML = [
+      { label: 'Cluster', value: (clusters || []).length, color: 'var(--color-cluster)' },
+      { label: 'Programme', value: (programmes || []).length, color: 'var(--color-programme)' },
+      { label: 'Module', value: modules.length, color: 'var(--color-module)' },
+      { label: 'Course Offering', value: offerings.length, color: 'var(--color-offering)' },
+      { label: 'Semester', value: semesters.length, color: 'var(--color-semester)' },
+      { label: 'Module có Offering', value: modulesWithOff, color: 'var(--color-ok)' },
+    ].map(t => `
     <div class="stat-tile" style="--tile-color:${t.color}">
       <div class="label"><span class="dot" style="background:${t.color}"></span>${t.label}</div>
       <div class="value">${t.value.toLocaleString()}</div>
     </div>
   `).join('');
 
-  document.getElementById('stats-relations').innerHTML = [
-    { label: 'Cluster → Programme', value: (mapClusterProgramme || []).length },
-    { label: 'Programme → Course', value: (mapProgrammeCourse || []).length },
-    { label: 'Module ≥ 2 Offering', value: modulesMulti },
-    { label: 'Module code multi-sem', value: multiSemModuleCodes.size },
-    { label: 'Offering≠Module code', value: offeringAncestors.filter(r => r.module && r.offering && r.module.Code !== r.offering.Code).length },
-    { label: 'Ancestor rows', value: offeringAncestors.length },
-  ].map(t => `
+    document.getElementById('stats-relations').innerHTML = [
+      { label: 'Cluster → Programme', value: (mapClusterProgramme || []).length },
+      { label: 'Programme → Course', value: (mapProgrammeCourse || []).length },
+      { label: 'Module ≥ 2 Offering', value: modulesMulti },
+      { label: 'Module code multi-sem', value: multiSemModuleCodes.size },
+      { label: 'Offering≠Module code', value: offeringAncestors.filter(r => r.module && r.offering && r.module.Code !== r.offering.Code).length },
+      { label: 'Ancestor rows', value: offeringAncestors.length },
+    ].map(t => `
     <div class="stat-tile">
       <div class="label">${t.label}</div>
       <div class="value">${t.value.toLocaleString()}</div>
     </div>
   `).join('');
 
-  document.getElementById('legend').innerHTML = Object.entries(TYPE_META).map(([, meta]) => `
-    <span class="legend-item"><span class="dot" style="width:9px;height:9px;background:${meta.color}"></span>${meta.label}</span>
+    document.getElementById('legend').innerHTML = Object.entries(TYPE_META).map(([, metaItem]) => `
+    <span class="legend-item"><span class="dot" style="width:9px;height:9px;background:${metaItem.color}"></span>${metaItem.label}</span>
   `).join('') + `
     <span class="legend-item"><span class="badge term">2610</span> trimester 4-digit</span>
     <span class="legend-item"><span class="badge ongoing">Ongoing</span> perpetual candidate</span>
   `;
+  }
+
+  function refreshAllPanels() {
+    document.getElementById('panel-cluster').innerHTML = '';
+    document.getElementById('panel-cluster').appendChild(buildClusterTree());
+    document.getElementById('panel-module').innerHTML = '';
+    document.getElementById('panel-module').appendChild(buildModuleTree());
+    document.getElementById('panel-semester').innerHTML = '';
+    document.getElementById('panel-semester').appendChild(buildSemesterTree());
+    document.getElementById('panel-quality').innerHTML = '';
+    document.getElementById('panel-quality').appendChild(buildQualityView());
+  }
+
+  refreshAllPanels();
+
+  ['filter-has-offerings', 'filter-multi-only', 'filter-multi-sem'].forEach(id => {
+    document.getElementById(id).addEventListener('change', rebuildModulePanel);
+  });
+
+  refreshStatsAndLegend();
 
   // Tabs
   const tabs = document.querySelectorAll('.tab-btn');
@@ -996,6 +1054,13 @@
 
   let detailHistory = [];
   let detailIndex = -1;
+  function resetDetailPanel() {
+    detailHistory.length = 0;
+    detailIndex = -1;
+    updateHistoryButtons();
+    document.getElementById('detail-body').innerHTML =
+      '<p class="detail-placeholder">Chọn một mục trong cây để xem chi tiết.</p>';
+  }
   function updateHistoryButtons() {
     document.getElementById('detail-back').disabled = detailIndex <= 0;
     document.getElementById('detail-forward').disabled = detailIndex >= detailHistory.length - 1;

@@ -1230,5 +1230,27 @@
       "Code": "Program",
       "Name": "Program"
     }
+  },
+  {
+    "Identifier": "27925",
+    "Path": "/content/enforced/27925-BS045_PROG_CSM/",
+    "Name": "Bachelor of Integrated Studies in Technology and Management",
+    "Code": "BS045_PROG_CSM",
+    "Type": {
+      "Id": 102,
+      "Code": "Program",
+      "Name": "Program"
+    }
+  },
+  {
+    "Identifier": "27929",
+    "Path": "/content/enforced/27929-BS9001_PROG_TEST/",
+    "Name": "Bachelor of Integrated Studies in Technology and Management",
+    "Code": "BS9001_PROG_CSMTEST",
+    "Type": {
+      "Id": 102,
+      "Code": "Program",
+      "Name": "Program"
+    }
   }
 ]
